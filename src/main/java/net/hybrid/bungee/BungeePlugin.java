@@ -5,6 +5,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 
 public class BungeePlugin extends Plugin {
 
+    //Testing comment to see if github logs work
     private Mongo mongo;
 
     @Override
