@@ -1,0 +1,4 @@
+name: HybridBungee
+main: net.hybrid.bungee.BungeePlugin
+version: 0.0.1
+authors: ["LiamHBest", "Hybrid Development"]
