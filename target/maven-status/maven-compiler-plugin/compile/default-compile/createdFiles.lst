@@ -1,0 +1,4 @@
+net\hybrid\bungee\commands\RankCommand.class
+net\hybrid\bungee\BungeePlugin.class
+net\hybrid\bungee\utility\CC.class
+net\hybrid\bungee\events\JoinNetworkEvent.class
