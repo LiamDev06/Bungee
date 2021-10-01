@@ -1,4 +1,7 @@
-net\hybrid\bungee\commands\RankCommand.class
-net\hybrid\bungee\BungeePlugin.class
+net\hybrid\bungee\utility\PlayerRank.class
+net\hybrid\bungee\data\Mongo.class
+net\hybrid\bungee\events\LeaveNetworkEvent.class
 net\hybrid\bungee\utility\CC.class
 net\hybrid\bungee\events\JoinNetworkEvent.class
+net\hybrid\bungee\utility\RankManager.class
+net\hybrid\bungee\BungeePlugin.class

@@ -33,12 +33,16 @@
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </repository>
     <repository>
+      <id>spigot-repo</id>
+      <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+    </repository>
+    <repository>
       <id>vault-repo</id>
       <url>http://nexus.hc.to/content/repositories/pub_releases</url>
     </repository>
     <repository>
-      <id>spigot-repo</id>
-      <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+      <id>sonatype</id>
+      <url>https://oss.sonatype.org/content/groups/public/</url>
     </repository>
   </repositories>
   <dependencies>
@@ -54,19 +58,6 @@
       <version>1.16-R0.5-SNAPSHOT</version>
       <type>javadoc</type>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc</groupId>
-      <artifactId>spigot-api</artifactId>
-      <version>1.8.8-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.hybrid</groupId>
-      <artifactId>HybridCorePlugin</artifactId>
-      <version>0.0.1</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/src/main/libs/HybridCorePlugin-0.0.1.jar</systemPath>
     </dependency>
   </dependencies>
   <properties>
