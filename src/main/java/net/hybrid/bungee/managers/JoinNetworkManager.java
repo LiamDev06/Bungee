@@ -1,4 +1,4 @@
-package net.hybrid.bungee.events;
+package net.hybrid.bungee.managers;
 
 import net.hybrid.bungee.BungeePlugin;
 import net.hybrid.bungee.utility.CC;
@@ -12,7 +12,7 @@ import org.bson.Document;
 
 import java.util.ArrayList;
 
-public class JoinNetworkEvent implements Listener {
+public class JoinNetworkManager implements Listener {
 
     private final static ArrayList<ProxiedPlayer> staff = new ArrayList<>();
 
@@ -35,6 +35,10 @@ public class JoinNetworkEvent implements Listener {
                                 + player.getName() + " &econnected."
                 )));
             }
+        }
+
+        if (document.getString("staffRank").equalsIgnoreCase("owner")) {
+            ChatManager.owners.add(player);
         }
     }
 

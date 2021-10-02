@@ -1,4 +1,4 @@
-package net.hybrid.bungee.events;
+package net.hybrid.bungee.managers;
 
 import net.hybrid.bungee.BungeePlugin;
 import net.hybrid.bungee.utility.CC;
@@ -10,7 +10,7 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import org.bson.Document;
 
-public class LeaveNetworkEvent implements Listener {
+public class LeaveNetworkManager implements Listener {
 
     @EventHandler
     public void onDisconnect(PlayerDisconnectEvent event) {
@@ -19,12 +19,12 @@ public class LeaveNetworkEvent implements Listener {
                 "playerData", player.getUniqueId());
 
         if (!document.getString("staffRank").equalsIgnoreCase("")) {
-            JoinNetworkEvent.getStaff().remove(player);
+            JoinNetworkManager.getStaff().remove(player);
         }
 
         if (!document.getString("staffRank").equalsIgnoreCase("")
                 || !document.getString("specialRank").equalsIgnoreCase("")) {
-            for (ProxiedPlayer target : JoinNetworkEvent.getStaff()) {
+            for (ProxiedPlayer target : JoinNetworkManager.getStaff()) {
                 target.sendMessage(new TextComponent(CC.translate(
                         "&b[STAFF] " +
                                 new RankManager(player.getUniqueId()).getRank().getPrefixSpace()
@@ -32,5 +32,7 @@ public class LeaveNetworkEvent implements Listener {
                 )));
             }
         }
+
+        ChatManager.owners.remove(player);
     }
 }

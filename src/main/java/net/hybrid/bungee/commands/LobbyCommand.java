@@ -11,7 +11,7 @@ import net.md_5.bungee.api.plugin.Command;
 public class LobbyCommand extends Command {
 
     public LobbyCommand() {
-        super("lobby", "", "hub", "mainhub", "mainlobby");
+        super("lobby", "", "hub", "mainhub", "mainlobby", "l");
     }
 
     @Override

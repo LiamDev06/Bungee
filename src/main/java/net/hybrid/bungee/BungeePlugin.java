@@ -2,8 +2,9 @@ package net.hybrid.bungee;
 
 import net.hybrid.bungee.commands.LobbyCommand;
 import net.hybrid.bungee.data.Mongo;
-import net.hybrid.bungee.events.JoinNetworkEvent;
-import net.hybrid.bungee.events.LeaveNetworkEvent;
+import net.hybrid.bungee.managers.ChatManager;
+import net.hybrid.bungee.managers.JoinNetworkManager;
+import net.hybrid.bungee.managers.LeaveNetworkManager;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class BungeePlugin extends Plugin {
@@ -20,8 +21,9 @@ public class BungeePlugin extends Plugin {
 
         getProxy().getPluginManager().registerCommand(this, new LobbyCommand());
 
-        getProxy().getPluginManager().registerListener(this, new LeaveNetworkEvent());
-        getProxy().getPluginManager().registerListener(this, new JoinNetworkEvent());
+        getProxy().getPluginManager().registerListener(this, new LeaveNetworkManager());
+        getProxy().getPluginManager().registerListener(this, new JoinNetworkManager());
+        getProxy().getPluginManager().registerListener(this, new ChatManager());
 
         getLogger().info("Hybrid Bungee system has been SUCCESSFULLY loaded in " + (System.currentTimeMillis() - time) + "ms!");
     }
