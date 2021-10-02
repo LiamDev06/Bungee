@@ -6,6 +6,5 @@ net\hybrid\bungee\managers\LeaveNetworkManager.class
 net\hybrid\bungee\utility\ChatChannelManager.class
 net\hybrid\bungee\utility\RankManager.class
 net\hybrid\bungee\commands\LobbyCommand.class
-net\hybrid\bungee\managers\ChatManager.class
 net\hybrid\bungee\BungeePlugin.class
 net\hybrid\bungee\utility\ChatChannel.class

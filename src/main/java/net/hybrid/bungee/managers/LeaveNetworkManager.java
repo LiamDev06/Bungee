@@ -32,7 +32,5 @@ public class LeaveNetworkManager implements Listener {
                 )));
             }
         }
-
-        ChatManager.owners.remove(player);
     }
 }

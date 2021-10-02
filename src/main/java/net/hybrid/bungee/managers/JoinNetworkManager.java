@@ -36,10 +36,6 @@ public class JoinNetworkManager implements Listener {
                 )));
             }
         }
-
-        if (document.getString("staffRank").equalsIgnoreCase("owner")) {
-            ChatManager.owners.add(player);
-        }
     }
 
     public static ArrayList<ProxiedPlayer> getStaff() {
