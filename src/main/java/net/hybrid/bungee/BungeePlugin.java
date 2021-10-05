@@ -1,9 +1,11 @@
 package net.hybrid.bungee;
 
-import net.hybrid.bungee.commands.LobbyCommand;
+import net.hybrid.bungee.commands.*;
 import net.hybrid.bungee.data.Mongo;
+import net.hybrid.bungee.managers.ChatManager;
 import net.hybrid.bungee.managers.JoinNetworkManager;
 import net.hybrid.bungee.managers.LeaveNetworkManager;
+import net.hybrid.bungee.managers.MessageListener;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class BungeePlugin extends Plugin {
@@ -19,7 +21,13 @@ public class BungeePlugin extends Plugin {
         mongo = new Mongo(this);
 
         getProxy().getPluginManager().registerCommand(this, new LobbyCommand());
+        getProxy().getPluginManager().registerCommand(this, new SendCommand());
+        getProxy().getPluginManager().registerCommand(this, new OwnerChatCommand());
+        getProxy().getPluginManager().registerCommand(this, new AdminChatCommand());
+        getProxy().getPluginManager().registerCommand(this, new StaffChatCommand());
 
+        getProxy().getPluginManager().registerListener(this, new MessageListener());
+        getProxy().getPluginManager().registerListener(this, new ChatManager());
         getProxy().getPluginManager().registerListener(this, new LeaveNetworkManager());
         getProxy().getPluginManager().registerListener(this, new JoinNetworkManager());
 

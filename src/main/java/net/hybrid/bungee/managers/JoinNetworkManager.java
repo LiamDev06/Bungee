@@ -36,6 +36,20 @@ public class JoinNetworkManager implements Listener {
                 )));
             }
         }
+
+        if (!document.getString("staffRank").equalsIgnoreCase("")) {
+            BungeePlugin.getInstance().getMongo().getStaff().add(player.getUniqueId());
+        }
+
+        if (document.getString("staffRank").equalsIgnoreCase("owner")) {
+            BungeePlugin.getInstance().getMongo().getAdmins().add(player.getUniqueId());
+            BungeePlugin.getInstance().getMongo().getOwners().add(player.getUniqueId());
+            return;
+        }
+
+        if (document.getString("staffRank").equalsIgnoreCase("admin")) {
+            BungeePlugin.getInstance().getMongo().getAdmins().add(player.getUniqueId());
+        }
     }
 
     public static ArrayList<ProxiedPlayer> getStaff() {

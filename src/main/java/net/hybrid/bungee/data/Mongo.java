@@ -8,11 +8,16 @@ import com.mongodb.client.model.UpdateOptions;
 import net.hybrid.bungee.BungeePlugin;
 import org.bson.Document;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class Mongo {
 
     private final MongoDatabase coreDatabase;
+
+    private final ArrayList<UUID> owners = new ArrayList<>();
+    private final ArrayList<UUID> admins = new ArrayList<>();
+    private final ArrayList<UUID> staff = new ArrayList<>();
 
     public Mongo(BungeePlugin plugin) {
         String connectionString = "mongodb+srv://HybridNetwork:jdfsdsf879hjgfdg5@cluster0.0bfk6.mongodb.net/test?retryWrites=true&w=majority";
@@ -59,4 +64,15 @@ public class Mongo {
         return coreDatabase;
     }
 
+    public ArrayList<UUID> getOwners() {
+        return owners;
+    }
+
+    public ArrayList<UUID> getAdmins() {
+        return admins;
+    }
+
+    public ArrayList<UUID> getStaff() {
+        return staff;
+    }
 }

@@ -29,16 +29,31 @@ public class RankManager {
             document.replace("staffNotifyMode", false);
             document.replace("staffBuildMode", false);
 
+            if (document.getString("chatChannel").equalsIgnoreCase("staff") ||
+                    document.getString("chatChannel").equalsIgnoreCase("builder") ||
+                    document.getString("chatChannel").equalsIgnoreCase("admin") ||
+                    document.getString("chatChannel").equalsIgnoreCase("owner")) {
+                document.replace("chatChannel", "ALL");
+            }
+
         } else {
             document.replace("playerRank", playerRank.name());
             document.replace("specialRank", "");
             document.replace("staffRank", "");
             document.replace("staffNotifyMode", false);
             document.replace("staffBuildMode", false);
+
+            if (document.getString("chatChannel").equalsIgnoreCase("staff") ||
+                    document.getString("chatChannel").equalsIgnoreCase("builder") ||
+                    document.getString("chatChannel").equalsIgnoreCase("admin") ||
+                    document.getString("chatChannel").equalsIgnoreCase("owner")) {
+                document.replace("chatChannel", "ALL");
+            }
+
         }
 
         document.replace("adminDebugMode", false);
-        document.replace("chatColor", ChatColor.WHITE.toString());
+        document.replace("chatColor", ChatColor.WHITE.name());
 
         mongo.saveDocument("playerData", document, uuid);
     }
@@ -81,4 +96,22 @@ public class RankManager {
         return hasRank(PlayerRank.ADMIN);
     }
 
+    public String getName() {
+        return BungeePlugin.getInstance().getProxy().getPlayer(uuid).getName();
+    }
+
+    public String getColoredName() {
+        return this.getRank().getColor() + getName();
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
