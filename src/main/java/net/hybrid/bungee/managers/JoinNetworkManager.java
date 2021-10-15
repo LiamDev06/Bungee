@@ -37,6 +37,12 @@ public class JoinNetworkManager implements Listener {
             }
         }
 
+        if (RankManager.getRankCache().containsKey(player.getUniqueId())) {
+            RankManager.getRankCache().replace(player.getUniqueId(), new RankManager(player.getUniqueId()).getRank());
+        } else {
+            RankManager.getRankCache().put(player.getUniqueId(), new RankManager(player.getUniqueId()).getRank());
+        }
+
         if (!document.getString("staffRank").equalsIgnoreCase("")) {
             BungeePlugin.getInstance().getMongo().getStaff().add(player.getUniqueId());
         }
@@ -50,6 +56,9 @@ public class JoinNetworkManager implements Listener {
         if (document.getString("staffRank").equalsIgnoreCase("admin")) {
             BungeePlugin.getInstance().getMongo().getAdmins().add(player.getUniqueId());
         }
+
+        document.replace("lastLogin", System.currentTimeMillis());
+        BungeePlugin.getInstance().getMongo().saveDocument("playerData", document, player.getUniqueId());
     }
 
     public static ArrayList<ProxiedPlayer> getStaff() {

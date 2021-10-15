@@ -4,13 +4,10 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import net.hybrid.bungee.BungeePlugin;
 import net.hybrid.bungee.data.Mongo;
+import net.hybrid.bungee.utility.ChatChannelManager;
 import net.hybrid.bungee.utility.PlayerRank;
 import net.hybrid.bungee.utility.RankManager;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
-import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
@@ -40,6 +37,12 @@ public class MessageListener implements Listener {
             PlayerRank playerRank = PlayerRank.valueOf(rankName.toUpperCase());
             RankManager rankManager = new RankManager(targetUuid);
 
+            if (!playerRank.isStaffRank()) {
+                mongo.getOwners().remove(targetUuid);
+                mongo.getAdmins().remove(targetUuid);
+                mongo.getStaff().remove(targetUuid);
+                RankManager.getRankCache().remove(targetUuid);
+            }
 
         }
     }

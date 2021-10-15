@@ -1,5 +1,8 @@
+net\hybrid\bungee\commands\EnableMaintenanceCommand.class
 net\hybrid\bungee\managers\JoinNetworkManager.class
 net\hybrid\bungee\data\Mongo.class
+net\hybrid\bungee\utility\MessageReply.class
+net\hybrid\bungee\commands\DisableMaintenanceCommand.class
 net\hybrid\bungee\commands\OwnerChatCommand.class
 net\hybrid\bungee\commands\SendCommand.class
 net\hybrid\bungee\utility\RankManager.class
@@ -8,9 +11,11 @@ net\hybrid\bungee\BungeePlugin.class
 net\hybrid\bungee\commands\StaffChatCommand.class
 net\hybrid\bungee\utility\PlayerRank.class
 net\hybrid\bungee\commands\AdminChatCommand.class
+net\hybrid\bungee\commands\ReplyCommand.class
 net\hybrid\bungee\utility\CC.class
 net\hybrid\bungee\managers\LeaveNetworkManager.class
 net\hybrid\bungee\utility\ChatChannelManager.class
+net\hybrid\bungee\commands\MsgCommand.class
 net\hybrid\bungee\managers\ChatManager.class
 net\hybrid\bungee\utility\ChatChannel.class
 net\hybrid\bungee\managers\MessageListener.class
