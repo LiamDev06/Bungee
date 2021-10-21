@@ -2,15 +2,12 @@ package net.hybrid.bungee.commands;
 
 import net.hybrid.bungee.BungeePlugin;
 import net.hybrid.bungee.utility.CC;
-import net.hybrid.bungee.utility.PlayerRank;
 import net.hybrid.bungee.utility.RankManager;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
-
-import java.util.concurrent.TimeUnit;
 
 public class EnableMaintenanceCommand extends Command {
 
@@ -37,7 +34,20 @@ public class EnableMaintenanceCommand extends Command {
 
         String value = args[0];
         if (value.equalsIgnoreCase("all")) {
+            for (ProxiedPlayer target : BungeePlugin.getInstance().getProxy().getPlayers()) {
+                RankManager rankManager = new RankManager(target.getUniqueId());
+                if (!rankManager.isStaff()) {
+                    target.disconnect(new TextComponent(CC.translate(
+                            "&c&lMAINTENANCE MODE\n" +
+                                    "&cHybrid is currently in maintenance mode!\n" +
+                                    "&7Check out &6https://dsc.gg/hybridserver&7 for updates!"
+                    )));
+                }
 
+                BungeePlugin.getInstance().getProxy().broadcast(new TextComponent(CC.translate(
+                        "&6&lNETWORK WIDE MAINTENANCE MODE HAS BEEN &a&lENABLED&6&l!"
+                )));
+            }
         }
 
         ServerInfo server = BungeePlugin.getInstance().getProxy().getServerInfo(value.toLowerCase());
@@ -46,6 +56,22 @@ public class EnableMaintenanceCommand extends Command {
             return;
         }
 
+        for (ProxiedPlayer target : server.getPlayers()) {
+            RankManager rankManager = new RankManager(target.getUniqueId());
+            if (!rankManager.isStaff()) {
+                target.connect(BungeePlugin.getInstance().getProxy().getServerInfo("mainlobby1"));
+            }
+
+            target.sendMessage(new TextComponent(CC.translate(
+                    "&aThe server you were on entered &cmaintenance mode&a! You were re-routed to the main lobby..."
+            )));
+        }
+
+        for (ProxiedPlayer target : server.getPlayers()) {
+            target.sendMessage(new TextComponent(CC.translate(
+                    "&6&lMAINTENANCE MODE FOR SERVER &b&l" + server.getName() + " &6&lHAS BEEN &a&lENABLED&6&l!"
+            )));
+        }
 
     }
 }

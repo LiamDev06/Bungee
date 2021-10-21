@@ -10,11 +10,9 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import org.bson.Document;
 
-import java.util.ArrayList;
+import java.util.UUID;
 
 public class JoinNetworkManager implements Listener {
-
-    private final static ArrayList<ProxiedPlayer> staff = new ArrayList<>();
 
     @EventHandler
     public void onPostLogin(PostLoginEvent event) {
@@ -22,13 +20,11 @@ public class JoinNetworkManager implements Listener {
         Document document = BungeePlugin.getInstance().getMongo().loadDocument(
                 "playerData", player.getUniqueId());
 
-        if (!document.getString("staffRank").equalsIgnoreCase("")) {
-            staff.add(player);
-        }
-
         if (!document.getString("staffRank").equalsIgnoreCase("")
                 || !document.getString("specialRank").equalsIgnoreCase("")) {
-            for (ProxiedPlayer target : staff) {
+            for (UUID targetUuid : BungeePlugin.getInstance().getMongo().getStaff()) {
+                ProxiedPlayer target = BungeePlugin.getInstance().getProxy().getPlayer(targetUuid);
+
                 target.sendMessage(new TextComponent(CC.translate(
                         "&b[STAFF] " +
                                 new RankManager(player.getUniqueId()).getRank().getPrefixSpace()
@@ -60,11 +56,6 @@ public class JoinNetworkManager implements Listener {
         document.replace("lastLogin", System.currentTimeMillis());
         BungeePlugin.getInstance().getMongo().saveDocument("playerData", document, player.getUniqueId());
     }
-
-    public static ArrayList<ProxiedPlayer> getStaff() {
-        return staff;
-    }
-
 }
 
 

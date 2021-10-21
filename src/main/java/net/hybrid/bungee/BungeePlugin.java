@@ -6,6 +6,7 @@ import net.hybrid.bungee.managers.ChatManager;
 import net.hybrid.bungee.managers.JoinNetworkManager;
 import net.hybrid.bungee.managers.LeaveNetworkManager;
 import net.hybrid.bungee.managers.MessageListener;
+import net.hybrid.bungee.moderation.commands.KickCommand;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class BungeePlugin extends Plugin {
@@ -25,6 +26,8 @@ public class BungeePlugin extends Plugin {
         getProxy().getPluginManager().registerCommand(this, new OwnerChatCommand());
         getProxy().getPluginManager().registerCommand(this, new AdminChatCommand());
         getProxy().getPluginManager().registerCommand(this, new StaffChatCommand());
+
+        getProxy().getPluginManager().registerCommand(this, new KickCommand());
 
         getProxy().getPluginManager().registerCommand(this, new MsgCommand());
         getProxy().getPluginManager().registerCommand(this, new ReplyCommand());
