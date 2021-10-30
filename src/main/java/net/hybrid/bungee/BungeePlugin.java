@@ -26,6 +26,7 @@ public class BungeePlugin extends Plugin {
         getProxy().getPluginManager().registerCommand(this, new OwnerChatCommand());
         getProxy().getPluginManager().registerCommand(this, new AdminChatCommand());
         getProxy().getPluginManager().registerCommand(this, new StaffChatCommand());
+        getProxy().getPluginManager().registerCommand(this, new PurchaseRankCommand());
 
         getProxy().getPluginManager().registerCommand(this, new KickCommand());
 

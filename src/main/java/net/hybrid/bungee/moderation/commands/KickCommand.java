@@ -75,7 +75,7 @@ public class KickCommand extends Command {
 
                 player.sendMessage(new TextComponent(CC.translate(
                         "&aYou successfully kicked " + targetRank
-                        .getRank().getPrefixSpace() + target.getName() + " &afrom the network with: &fNo Reason&a. This has been logged."
+                        .getRank().getPrefixSpace() + target.getName() + " &afrom the network with: &fNo Reason&a. &aThis has been logged."
                 )));
                 return;
             }

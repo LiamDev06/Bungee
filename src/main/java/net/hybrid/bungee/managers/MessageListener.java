@@ -54,5 +54,9 @@ public class MessageListener implements Listener {
                 mongo.getOwners().add(targetUuid);
             }
         }
+
+        if (subChannel.equals("Forward")) {
+
+        }
     }
 }

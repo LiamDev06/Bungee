@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public class Mongo {
 
-    private final MongoDatabase coreDatabase;
+    public final MongoDatabase coreDatabase;
 
     private final ArrayList<UUID> owners = new ArrayList<>();
     private final ArrayList<UUID> admins = new ArrayList<>();
@@ -43,9 +43,8 @@ public class Mongo {
     }
 
     public Document loadDocument(String collectionName, String find, Object value) {
-        Document document = coreDatabase.getCollection(collectionName)
+        return coreDatabase.getCollection(collectionName)
                 .find(Filters.eq(find, value)).first();
-        return document;
     }
 
     public void saveDocument(String collectionName, Document document, UUID uuid) {
