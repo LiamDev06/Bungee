@@ -1,14 +1,12 @@
 C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\net\hybrid\bungee\commands\LobbyCommand.java
-C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\net\hybrid\bungee\commands\DisableMaintenanceCommand.java
 C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\net\hybrid\bungee\utility\ChatChannelManager.java
-C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\net\hybrid\bungee\moderation\ModerationLogger.java
 C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\net\hybrid\bungee\commands\SendCommand.java
 C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\net\hybrid\bungee\utility\CC.java
 C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\net\hybrid\bungee\BungeePlugin.java
 C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\net\hybrid\bungee\managers\JoinNetworkManager.java
 C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\net\hybrid\bungee\commands\AdminChatCommand.java
-C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\net\hybrid\bungee\commands\EnableMaintenanceCommand.java
 C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\net\hybrid\bungee\data\Mongo.java
+C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\net\hybrid\bungee\managers\ServerShutdownListener.java
 C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\net\hybrid\bungee\commands\PurchaseRankCommand.java
 C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\net\hybrid\bungee\managers\ChatManager.java
 C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\net\hybrid\bungee\commands\MsgCommand.java
@@ -21,4 +19,3 @@ C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\ne
 C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\net\hybrid\bungee\commands\StaffChatCommand.java
 C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\net\hybrid\bungee\utility\RankManager.java
 C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\net\hybrid\bungee\commands\ReplyCommand.java
-C:\Users\liamh\OneDrive\Skrivbord\New Hybrid\Development\Bungee\src\main\java\net\hybrid\bungee\moderation\commands\KickCommand.java

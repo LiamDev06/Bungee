@@ -11,7 +11,7 @@ public enum PlayerRank {
     HELPER(ChatColor.DARK_AQUA, CC.translate("&3[HELPER]"), CC.translate("&3[HELPER] "), CC.translate("&3Helper"), true, 7),
     PARTNER(ChatColor.DARK_GREEN, CC.translate("&2[PARTNER]"), CC.translate("&2[PARTNER] "), CC.translate("&2Partner"), false, 6),
     YOUTUBER(ChatColor.RED, CC.translate("&c[YOU&fTUBE&c]"), CC.translate("&c[YOU&fTUBE&c] "), CC.translate("&cYouTube"), false, 5),
-    TWITCH_STREAMER(ChatColor.DARK_PURPLE, CC.translate("&5[TW&fICH&5]"), CC.translate("&5[TW&fICH&5] "), CC.translate("&5Twitch"), false, 4),
+    TWITCH_STREAMER(ChatColor.DARK_PURPLE, CC.translate("&5[TWI&fTCH&5]"),CC.translate("&5[TWI&fTCH&5] "), CC.translate("&5Twitch"), false, 4),
     DIAMOND(ChatColor.AQUA, CC.translate("&b[DIAMOND]"), CC.translate("&b[DIAMOND] "), CC.translate("&bDiamond"), false, 3),
     IRON(ChatColor.WHITE, CC.translate("&f[IRON]"), CC.translate("&f[IRON] "), CC.translate("&fIron"), false, 2),
     MEMBER(ChatColor.GREEN, CC.translate("&a"), CC.translate("&a"), CC.translate("&aMember"), false, 1);

@@ -22,7 +22,7 @@ public class LeaveNetworkManager implements Listener {
 
         if (!document.getString("staffRank").equalsIgnoreCase("")
                 || !document.getString("specialRank").equalsIgnoreCase("")) {
-            for (UUID targetUuid : BungeePlugin.getInstance().getMongo().getStaff()) {
+            for (UUID targetUuid : BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode()) {
                 ProxiedPlayer target = BungeePlugin.getInstance().getProxy().getPlayer(targetUuid);
 
                 target.sendMessage(new TextComponent(CC.translate(
@@ -33,6 +33,7 @@ public class LeaveNetworkManager implements Listener {
             }
         }
 
+        BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode().remove(player.getUniqueId());
         BungeePlugin.getInstance().getMongo().getStaff().remove(player.getUniqueId());
         BungeePlugin.getInstance().getMongo().getAdmins().remove(player.getUniqueId());
         BungeePlugin.getInstance().getMongo().getOwners().remove(player.getUniqueId());

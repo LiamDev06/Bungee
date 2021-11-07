@@ -18,6 +18,7 @@ public class Mongo {
     private final ArrayList<UUID> owners = new ArrayList<>();
     private final ArrayList<UUID> admins = new ArrayList<>();
     private final ArrayList<UUID> staff = new ArrayList<>();
+    private final ArrayList<UUID> staffOnNotify = new ArrayList<>();
 
     public Mongo(BungeePlugin plugin) {
         String connectionString = "mongodb+srv://HybridNetwork:jdfsdsf879hjgfdg5@cluster0.0bfk6.mongodb.net/test?retryWrites=true&w=majority";
@@ -47,6 +48,10 @@ public class Mongo {
                 .find(Filters.eq(find, value)).first();
     }
 
+    public void saveDocument(String collectionName, Document document) {
+        coreDatabase.getCollection(collectionName).insertOne(document);
+    }
+
     public void saveDocument(String collectionName, Document document, UUID uuid) {
         coreDatabase.getCollection(collectionName)
                 .replaceOne(Filters.eq("playerUuid", uuid.toString()), document
@@ -73,5 +78,9 @@ public class Mongo {
 
     public ArrayList<UUID> getStaff() {
         return staff;
+    }
+
+    public ArrayList<UUID> getStaffOnNotifyMode() {
+        return staffOnNotify;
     }
 }

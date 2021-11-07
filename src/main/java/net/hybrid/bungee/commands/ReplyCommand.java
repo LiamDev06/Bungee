@@ -20,6 +20,13 @@ public class ReplyCommand extends Command {
         if (!(commandSender instanceof ProxiedPlayer)) return;
         ProxiedPlayer player = (ProxiedPlayer) commandSender;
 
+        if (MsgCommand.isMuted(player.getUniqueId())) {
+            player.sendMessage(new TextComponent(CC.translate(
+                    "&c&lYou are currently MUTED and can therefore not reply to anyone!"
+            )));
+            return;
+        }
+
         if (MessageReply.getMessageReply(player.getUniqueId()) == null) {
             player.sendMessage(new TextComponent(CC.translate("&cYou have no one to reply to!")));
             return;

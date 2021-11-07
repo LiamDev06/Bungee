@@ -2,11 +2,7 @@ package net.hybrid.bungee;
 
 import net.hybrid.bungee.commands.*;
 import net.hybrid.bungee.data.Mongo;
-import net.hybrid.bungee.managers.ChatManager;
-import net.hybrid.bungee.managers.JoinNetworkManager;
-import net.hybrid.bungee.managers.LeaveNetworkManager;
-import net.hybrid.bungee.managers.MessageListener;
-import net.hybrid.bungee.moderation.commands.KickCommand;
+import net.hybrid.bungee.managers.*;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class BungeePlugin extends Plugin {
@@ -28,17 +24,14 @@ public class BungeePlugin extends Plugin {
         getProxy().getPluginManager().registerCommand(this, new StaffChatCommand());
         getProxy().getPluginManager().registerCommand(this, new PurchaseRankCommand());
 
-        getProxy().getPluginManager().registerCommand(this, new KickCommand());
-
         getProxy().getPluginManager().registerCommand(this, new MsgCommand());
         getProxy().getPluginManager().registerCommand(this, new ReplyCommand());
-        getProxy().getPluginManager().registerCommand(this, new EnableMaintenanceCommand());
-        getProxy().getPluginManager().registerCommand(this, new DisableMaintenanceCommand());
 
         getProxy().getPluginManager().registerListener(this, new MessageListener());
         getProxy().getPluginManager().registerListener(this, new ChatManager());
         getProxy().getPluginManager().registerListener(this, new LeaveNetworkManager());
         getProxy().getPluginManager().registerListener(this, new JoinNetworkManager());
+        getProxy().getPluginManager().registerListener(this, new ServerShutdownListener());
 
         getLogger().info("Hybrid Bungee system has been SUCCESSFULLY loaded in " + (System.currentTimeMillis() - time) + "ms!");
     }
