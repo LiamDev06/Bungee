@@ -3,12 +3,16 @@ package net.hybrid.bungee;
 import net.hybrid.bungee.commands.*;
 import net.hybrid.bungee.data.Mongo;
 import net.hybrid.bungee.managers.*;
+import net.hybrid.bungee.party.PartyCommand;
+import net.hybrid.bungee.party.PartyManager;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.plugin.PluginManager;
 
 public class BungeePlugin extends Plugin {
 
     private static BungeePlugin INSTANCE;
     private Mongo mongo;
+    private PartyManager partyManager;
 
     @Override
     public void onEnable(){
@@ -16,22 +20,27 @@ public class BungeePlugin extends Plugin {
         INSTANCE = this;
 
         mongo = new Mongo(this);
+        partyManager = new PartyManager();
 
-        getProxy().getPluginManager().registerCommand(this, new LobbyCommand());
-        getProxy().getPluginManager().registerCommand(this, new SendCommand());
-        getProxy().getPluginManager().registerCommand(this, new OwnerChatCommand());
-        getProxy().getPluginManager().registerCommand(this, new AdminChatCommand());
-        getProxy().getPluginManager().registerCommand(this, new StaffChatCommand());
-        getProxy().getPluginManager().registerCommand(this, new PurchaseRankCommand());
+        PluginManager manager = getProxy().getPluginManager();
 
-        getProxy().getPluginManager().registerCommand(this, new MsgCommand());
-        getProxy().getPluginManager().registerCommand(this, new ReplyCommand());
+        manager.registerCommand(this, new LobbyCommand());
+        manager.registerCommand(this, new SendCommand());
+        manager.registerCommand(this, new OwnerChatCommand());
+        manager.registerCommand(this, new AdminChatCommand());
+        manager.registerCommand(this, new StaffChatCommand());
+        manager.registerCommand(this, new PurchaseRankCommand());
 
-        getProxy().getPluginManager().registerListener(this, new MessageListener());
-        getProxy().getPluginManager().registerListener(this, new ChatManager());
-        getProxy().getPluginManager().registerListener(this, new LeaveNetworkManager());
-        getProxy().getPluginManager().registerListener(this, new JoinNetworkManager());
-        getProxy().getPluginManager().registerListener(this, new ServerShutdownListener());
+        manager.registerCommand(this, new FindPlayerCommand());
+        manager.registerCommand(this, new PartyCommand());
+        manager.registerCommand(this, new MsgCommand());
+        manager.registerCommand(this, new ReplyCommand());
+
+        manager.registerListener(this, new MessageListener());
+        manager.registerListener(this, new ChatManager());
+        manager.registerListener(this, new LeaveNetworkManager());
+        manager.registerListener(this, new JoinNetworkManager());
+        manager.registerListener(this, new ServerShutdownListener());
 
         getLogger().info("Hybrid Bungee system has been SUCCESSFULLY loaded in " + (System.currentTimeMillis() - time) + "ms!");
     }
@@ -50,6 +59,9 @@ public class BungeePlugin extends Plugin {
         return mongo;
     }
 
+    public PartyManager getPartyManager() {
+        return partyManager;
+    }
 }
 
 

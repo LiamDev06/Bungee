@@ -8,7 +8,10 @@ import net.hybrid.bungee.utility.CC;
 import net.hybrid.bungee.utility.ChatChannel;
 import net.hybrid.bungee.utility.PlayerRank;
 import net.hybrid.bungee.utility.RankManager;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -27,6 +30,29 @@ public class MessageListener implements Listener {
 
         ByteArrayDataInput in = ByteStreams.newDataInput(event.getData());
         String subChannel = in.readUTF();
+
+        //TODO Fix rank thingy
+
+        if (subChannel.equalsIgnoreCase("SendToLobbyIssued")) {
+            final String serverValue = in.readUTF();
+            final String updateValue = in.readUTF();
+            final String issuerUUID = in.readUTF();
+
+            if (!serverValue.equalsIgnoreCase("ONLINE") &&
+                    !updateValue.equalsIgnoreCase("SendToLobbyIssued")) return;
+
+            ProxiedPlayer player = BungeePlugin.getInstance().getProxy().getPlayer(UUID.fromString(issuerUUID));
+            if (player != null) {
+                if (player.getServer().getInfo().getName().equalsIgnoreCase("mainlobby1")) {
+                    player.sendMessage(new ComponentBuilder("You are already at the main lobby!").color(ChatColor.RED).create());
+                    return;
+                }
+
+                player.sendMessage(new ComponentBuilder("Sending you to mainlobby1...").color(ChatColor.GREEN).create());
+                ServerInfo server = BungeePlugin.getInstance().getProxy().getServerInfo("mainlobby1");
+                player.connect(server);
+            }
+        }
 
         if (subChannel.equalsIgnoreCase("Forward")) {
             final String serverValue = in.readUTF();
@@ -47,13 +73,13 @@ public class MessageListener implements Listener {
 
             if (playerRank.isStaffRank()) {
                 mongo.getStaff().add(targetUuid);
+                mongo.getStaffOnNotifyMode().add(targetUuid);
             }
 
             if (playerRank == PlayerRank.ADMIN) {
                 mongo.getAdmins().add(targetUuid);
-            }
 
-            if (playerRank == PlayerRank.OWNER) {
+            } else if (playerRank == PlayerRank.OWNER) {
                 mongo.getAdmins().add(targetUuid);
                 mongo.getOwners().add(targetUuid);
             }
@@ -75,7 +101,7 @@ public class MessageListener implements Listener {
                 against.disconnect(new TextComponent(CC.translate(
                         "&cYou have been permanently banned from this server!\n\n" +
                                 "&7Reason: &f" + reason + "\n" +
-                                "&7Punished falsely? Create a ticket at &b&nhttps://hybridplays.com/discord&7 and explain the situation."
+                                "&7Punished falsely? Create a ticket at &b&nhttps://hybridplays.com/discord &7and explain &7the situation."
                 )));
             }
 
@@ -89,11 +115,16 @@ public class MessageListener implements Listener {
                 value = true;
             }
 
+            StringBuilder finalReason = new StringBuilder();
+            for (String s : reason.split(" ")) {
+                finalReason.append("§6").append(s).append(" ");
+            }
+
             for (UUID targetStaff : BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode()) {
                 ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(targetStaff);
                 targetPlayer.sendMessage(new TextComponent(
                         ChatChannel.STAFF.getPrefix() + " " + rankManager.getRank().getPrefixSpace() + rankManager.getColoredName() + CC.translate(
-                                " &apermanently banned " + againstManager.getRank().getPrefixSpace() + againstName + "&a for: &6" + reason
+                                " &apermanently banned " + againstManager.getRank().getPrefixSpace() + againstName + " &afor: &6" + finalReason.toString().trim()
                         )
                 ));
             }
@@ -124,11 +155,56 @@ public class MessageListener implements Listener {
                 value = true;
             }
 
+            StringBuilder finalReason = new StringBuilder();
+            for (String s : reason.split(" ")) {
+                finalReason.append("§6").append(s).append(" ");
+            }
+
             for (UUID targetStaff : BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode()) {
                 ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(targetStaff);
                 targetPlayer.sendMessage(new TextComponent(
                         ChatChannel.STAFF.getPrefix() + " " + rankManager.getRank().getPrefixSpace() + rankManager.getColoredName() + CC.translate(
-                                " &aunbanned " + againstManager.getRank().getPrefixSpace() + againstName + "&a with reason: &6" + reason
+                                " &aunbanned " + againstManager.getRank().getPrefixSpace() + againstName + " &awith reason: &6" + finalReason.toString().trim()
+                        )
+                ));
+            }
+
+            if (value) {
+                BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode().add(UUID.fromString(issuerUUID));
+            }
+        }
+
+        if (subChannel.equalsIgnoreCase("UnmuteIssued")) {
+            final String serverValue = in.readUTF();
+            final String updateValue = in.readUTF();
+            final String issuerUUID = in.readUTF();
+            final String againstUUID = in.readUTF();
+            final String reason = in.readUTF();
+            final String againstName = in.readUTF();
+
+            if (!serverValue.equalsIgnoreCase("ONLINE") &&
+                    !updateValue.equalsIgnoreCase("UnmuteIssued")) return;
+
+            RankManager rankManager = new RankManager(UUID.fromString(issuerUUID));
+            RankManager againstManager = new RankManager(UUID.fromString(againstUUID));
+
+            boolean value = false;
+
+            if (BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode().contains(UUID.fromString(issuerUUID))) {
+                BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode().remove(UUID.fromString(issuerUUID));
+                value = true;
+            }
+
+            StringBuilder finalReason = new StringBuilder();
+            for (String s : reason.split(" ")) {
+                finalReason.append("§6").append(s).append(" ");
+            }
+
+            for (UUID targetStaff : BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode()) {
+                ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(targetStaff);
+                targetPlayer.sendMessage(new TextComponent(
+                        ChatChannel.STAFF.getPrefix() + " " + rankManager.getRank().getPrefixSpace() + rankManager.getColoredName() + CC.translate(
+                                " &aunmuted " + againstManager.getRank().getPrefixSpace() + againstName + " &awith reason: &6" + finalReason.toString().trim()
                         )
                 ));
             }
@@ -173,7 +249,7 @@ public class MessageListener implements Listener {
                 against.disconnect(new TextComponent(CC.translate(
                         "&cYou have been kicked from the server!\n\n" +
                                 "&7Reason: &f" + reason + "\n" +
-                                "&7Punished falsely? Create a ticket at &b&nhttps://hybridplays.com/discord&7 and explain the situation."
+                                "&7Punished falsely? Create a ticket at &b&nhttps://hybridplays.com/discord &7and explain &7the situation."
                 )));
             } else {
                 BungeePlugin.getInstance().getProxy().getPlayer(UUID.fromString(issuerUUID))
@@ -192,11 +268,16 @@ public class MessageListener implements Listener {
                 value = true;
             }
 
+            StringBuilder finalReason = new StringBuilder();
+            for (String s : reason.split(" ")) {
+                finalReason.append("§6").append(s).append(" ");
+            }
+
             for (UUID targetStaff : BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode()) {
                 ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(targetStaff);
                 targetPlayer.sendMessage(new TextComponent(
                         ChatChannel.STAFF.getPrefix() + " " + rankManager.getRank().getPrefixSpace() + rankManager.getColoredName() + CC.translate(
-                                " &akicked " + againstManager.getRank().getPrefixSpace() + againstName + "&a for: &6" + reason
+                                " &akicked " + againstManager.getRank().getPrefixSpace() + againstName + " &afor: &6" + finalReason.toString().trim()
                         )
                 ));
             }
@@ -234,7 +315,7 @@ public class MessageListener implements Listener {
                     against.disconnect(new TextComponent(CC.translate(
                             "&c&lYOU HAVE BEEN WARNED BY STAFF!\n" +
                             "&7Reason: &f" + reason + "\n\n" +
-                                    "&7Punished falsely? Create a ticket at &b&nhttps://hybridplays.com/discord&7 and explain the situation."
+                                    "&7Punished falsely? Create a &7ticket at &b&nhttps://hybridplays.com/discord&7 &7and &7explain &7the &7situation."
                     )));
 
                 } else {
@@ -243,17 +324,17 @@ public class MessageListener implements Listener {
                     )));
 
                     against.sendMessage(new TextComponent(CC.translate(
-                            "&c&lYOU HAVE BEEN WARNED BY STAFF!"
+                            "&c&lYOU HAVE BEEN &c&lWARNED BY STAFF!"
                     )));
 
                     against.sendMessage(new TextComponent(CC.translate(
-                            "&cYou have been warned with the reason: &f" + reason
+                            "&cYou have been warned &cwith the reason: &f" + reason
                     )));
 
                     against.sendMessage(new TextComponent("  "));
 
                     against.sendMessage(new TextComponent(CC.translate(
-                            "&7Punished falsely? Create a ticket at &b&nhttps://hybridplays.com/discord&7 and explain the situation."
+                            "&7Punished falsely? Create a ticket at &b&nhttps://hybridplays.com/discord &7and explain &7the situation."
                     )));
 
                     against.sendMessage(new TextComponent(CC.translate(
@@ -272,11 +353,16 @@ public class MessageListener implements Listener {
                 value = true;
             }
 
+            StringBuilder finalReason = new StringBuilder();
+            for (String s : reason.split(" ")) {
+                finalReason.append("&6").append(s).append(" ");
+            }
+
             for (UUID targetStaff : BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode()) {
                 ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(targetStaff);
                 targetPlayer.sendMessage(new TextComponent(
                         ChatChannel.STAFF.getPrefix() + " " + rankManager.getRank().getPrefixSpace() + rankManager.getColoredName() + CC.translate(
-                                " &awarned " + againstManager.getRank().getPrefixSpace() + againstName + "&a for: &6" + reason
+                                " &awarned " + againstManager.getRank().getPrefixSpace() + againstName + " &afor: &6" + finalReason.toString().trim()
                         )
                 ));
             }
@@ -303,7 +389,7 @@ public class MessageListener implements Listener {
                         "&c&lBLACKLISTED USERNAME!\n" +
                                 "&cYour Minecraft username '&f" + actualBadName + "&c' is not allowed on Hybrid!\n\n" +
                                 "&7To be able to play again, you must first change your username.\n" +
-                                "&7Punished falsely? Create a ticket at &b&nhttps://hybridplays.com/discord&7 and explain the situation."
+                                "&7Punished falsely? Create a ticket at &b&nhttps://hybridplays.com/discord &7and explain &7the situation."
                 )));
             }
 
@@ -321,7 +407,7 @@ public class MessageListener implements Listener {
                 ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(targetStaff);
                 targetPlayer.sendMessage(new TextComponent(
                         ChatChannel.STAFF.getPrefix() + " " + rankManager.getRank().getPrefixSpace() + rankManager.getColoredName() + CC.translate(
-                                " &a'bad-named' " + againstManager.getRank().getPrefixSpace() + againstName + "&a with the name '&6" + actualBadName + "&a'"
+                                " &a'bad-named' " + againstManager.getRank().getPrefixSpace() + againstName + " &awith the name '&6" + actualBadName + "&a'"
                         )
                 ));
             }
@@ -350,11 +436,16 @@ public class MessageListener implements Listener {
                 value = true;
             }
 
+            StringBuilder finalReason = new StringBuilder();
+            for (String s : reasonForRemoval.split(" ")) {
+                finalReason.append("§6").append(s).append(" ");
+            }
+
             for (UUID targetStaff : BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode()) {
                 ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(targetStaff);
                 targetPlayer.sendMessage(new TextComponent(
                         ChatChannel.STAFF.getPrefix() + " " + rankManager.getRank().getPrefixSpace() + rankManager.getColoredName() + CC.translate(
-                                " &aremoved the bad-name &6" + actualBadName + "&a from the bad-names list, with the reason: &6" + reasonForRemoval
+                                " &aremoved the bad-name &6" + actualBadName + " &afrom &athe &abad-names list, &awith the reason: &6" + finalReason.toString().trim()
                         )
                 ));
             }
@@ -372,12 +463,22 @@ public class MessageListener implements Listener {
             final String reason = in.readUTF();
             final String expiresNormal = in.readUTF();
             final String againstName = in.readUTF();
+            final String punishmentId = in.readUTF();
 
             if (!serverValue.equalsIgnoreCase("ONLINE") &&
                     !updateValue.equalsIgnoreCase("MuteIssued")) return;
 
             ProxiedPlayer against = BungeePlugin.getInstance().getProxy().getPlayer(UUID.fromString(againstUUID));
             if (against != null) {
+                Document document = mongo.loadDocument("punishments", "punishmentId", punishmentId);
+                document.replace("playerHasSeen", true);
+                mongo.saveDocument("punishments", document, "punishmentId", punishmentId);
+
+                StringBuilder finalReason = new StringBuilder();
+                for (String s : reason.split(" ")) {
+                    finalReason.append("§c").append(s).append(" ");
+                }
+
                 against.sendMessage(new TextComponent(CC.translate(
                         "&7&m-------------------------------------"
                 )));
@@ -387,7 +488,7 @@ public class MessageListener implements Listener {
                 )));
 
                 against.sendMessage(new TextComponent(CC.translate(
-                        "&cYou have been muted for " + reason
+                        "&cYou have &cbeen muted for " + finalReason.toString().trim()
                 )));
 
                 against.sendMessage(new TextComponent("  "));
@@ -397,7 +498,7 @@ public class MessageListener implements Listener {
                 )));
 
                 against.sendMessage(new TextComponent(CC.translate(
-                        "&7Punished falsely? Create a ticket at &b&nhttps://hybridplays.com/discord&7 and explain the situation."
+                        "&7Punished falsely? Create a ticket at &b&nhttps://hybridplays.com/discord &7and explain &7the situation."
                 )));
 
                 against.sendMessage(new TextComponent(CC.translate(
@@ -415,11 +516,76 @@ public class MessageListener implements Listener {
                 value = true;
             }
 
+            StringBuilder finalReason = new StringBuilder();
+            for (String s : reason.split(" ")) {
+                finalReason.append("§6").append(s).append(" ");
+            }
+
+            StringBuilder finalExpiresNormal = new StringBuilder();
+            for (String s : expiresNormal.split(" ")) {
+                finalExpiresNormal.append("§b").append(s).append(" ");
+            }
+
             for (UUID targetStaff : BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode()) {
                 ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(targetStaff);
                 targetPlayer.sendMessage(new TextComponent(
                         ChatChannel.STAFF.getPrefix() + " " + rankManager.getRank().getPrefixSpace() + rankManager.getColoredName() + CC.translate(
-                                " &amuted " + againstManager.getRank().getPrefixSpace() + againstName + "&a for &b" + expiresNormal + "&a, with the reason: &6" + reason
+                                " &amuted " + againstManager.getRank().getPrefixSpace() + againstName + " &afor &b" + finalExpiresNormal.toString().trim() + "&a, with the &areason: &6" + finalReason.toString().trim()
+                        )
+                ));
+            }
+
+            if (value) {
+                BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode().add(UUID.fromString(issuerUUID));
+            }
+        }
+
+        if (subChannel.equalsIgnoreCase("TempBanIssued")) {
+            final String serverValue = in.readUTF();
+            final String updateValue = in.readUTF();
+            final String issuerUUID = in.readUTF();
+            final String againstUUID = in.readUTF();
+            final String reason = in.readUTF();
+            final String expiresNormal = in.readUTF();
+            final String againstName = in.readUTF();
+
+            if (!serverValue.equalsIgnoreCase("ONLINE") &&
+                    !updateValue.equalsIgnoreCase("TempBanIssued")) return;
+
+            ProxiedPlayer against = BungeePlugin.getInstance().getProxy().getPlayer(UUID.fromString(againstUUID));
+            if (against != null) {
+                against.disconnect(new TextComponent(CC.translate(
+                        "&cYou have been temporarily banned for &f" + expiresNormal + " &cfrom this server!\n\n" +
+                                "&7Reason: &f" + reason + "\n" +
+                                "&7Punished falsely? Create a ticket at &b&nhttps://hybridplays.com/discord &7and explain &7the situation."
+                )));
+            }
+
+            RankManager rankManager = new RankManager(UUID.fromString(issuerUUID));
+            RankManager againstManager = new RankManager(UUID.fromString(againstUUID));
+
+            boolean value = false;
+
+            if (BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode().contains(UUID.fromString(issuerUUID))) {
+                BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode().remove(UUID.fromString(issuerUUID));
+                value = true;
+            }
+
+            StringBuilder finalReason = new StringBuilder();
+            for (String s : reason.split(" ")) {
+                finalReason.append("§6").append(s).append(" ");
+            }
+
+            StringBuilder finalExpiresNormal = new StringBuilder();
+            for (String s : expiresNormal.split(" ")) {
+                finalExpiresNormal.append("§b").append(s).append(" ");
+            }
+
+            for (UUID targetStaff : BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode()) {
+                ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(targetStaff);
+                targetPlayer.sendMessage(new TextComponent(
+                        ChatChannel.STAFF.getPrefix() + " " + rankManager.getRank().getPrefixSpace() + rankManager.getColoredName() + CC.translate(
+                                " &atemporarily banned " + againstManager.getRank().getPrefixSpace() + againstName + " &afor &b" + finalExpiresNormal.toString().trim() + "&a, with the &areason: &6" + finalReason.toString().trim()
                         )
                 ));
             }

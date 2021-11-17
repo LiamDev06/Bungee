@@ -18,10 +18,12 @@ public class ServerShutdownListener implements Listener {
         ServerInfo mainLobby = proxy.getServerInfo("mainlobby1");
         ProxiedPlayer player = event.getPlayer();
 
+        proxy.getLogger().info(event.getKickReason());
+
         if (mainLobby != null && !event.getKickedFrom().getName().equalsIgnoreCase("mainlobby1")) {
             player.sendMessage(new TextComponent(CC.translate(
-                    "&c&lSERVER RESTARTED! &cThe server you were on &7(" + event.getKickedFrom().getName() + ") " +
-                            "&crestarted and you were sent back &cto the main lobby!"
+                    "&c&lDISCONNECTED! &cYou got &cdisconnected from the &cserver you &cwere on &7(" + event.getKickedFrom().getName() + ") " +
+                            "&cand therefore &csent back &cto the main lobby!"
             )));
 
             event.setCancelServer(mainLobby);

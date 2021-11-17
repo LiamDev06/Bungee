@@ -22,18 +22,18 @@ public class ReplyCommand extends Command {
 
         if (MsgCommand.isMuted(player.getUniqueId())) {
             player.sendMessage(new TextComponent(CC.translate(
-                    "&c&lYou are currently MUTED and can therefore not reply to anyone!"
+                    "&c&lYou are &c&lcurrently MUTED &c&land can &c&ltherefore not &c&lreply &c&lto &c&lanyone!"
             )));
             return;
         }
 
         if (MessageReply.getMessageReply(player.getUniqueId()) == null) {
-            player.sendMessage(new TextComponent(CC.translate("&cYou have no one to reply to!")));
+            player.sendMessage(new TextComponent(CC.translate("&cYou have &cno one to &creply to!")));
             return;
         }
 
         if (args.length == 0) {
-            player.sendMessage(new TextComponent(CC.translate("&cMissing arguments! Reply to your last message with /reply <message>")));
+            player.sendMessage(new TextComponent(CC.translate("&c&lMISSING ARGUMENTS! &cReply to &cyour last &cmessage with &c/reply &c<message>")));
             return;
         }
 
@@ -41,21 +41,21 @@ public class ReplyCommand extends Command {
         ProxiedPlayer target = BungeePlugin.getInstance().getProxy().getPlayer(MessageReply.getMessageReply(player.getUniqueId()));
 
         if (target == null) {
-            player.sendMessage(new TextComponent(CC.translate("&cThis player is not online!")));
+            player.sendMessage(new TextComponent(CC.translate("&cThis player &cis not online!")));
             return;
         }
 
         if (target.getUniqueId() == player.getUniqueId()) {
-            player.sendMessage(new TextComponent(CC.translate("&cYou cannot reply to yourself!")));
+            player.sendMessage(new TextComponent(CC.translate("&cYou cannot &creply to yourself!")));
             return;
         }
 
         if (!MsgCommand.canSendMessageTo(target.getUniqueId()) && !new RankManager(player.getUniqueId()).isStaff()) {
-            player.sendMessage(new TextComponent(CC.translate("&cYou cannot reply to this player due to their settings!")));
+            player.sendMessage(new TextComponent(CC.translate("&cYou cannot &creply to this &cplayer due to their &csettings!")));
         }
 
         if (!target.isConnected()) {
-            player.sendMessage(new TextComponent(CC.translate("&cThis player is not online!")));
+            player.sendMessage(new TextComponent(CC.translate("&cThis player &cis not online!")));
             return;
         }
 

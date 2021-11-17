@@ -4,6 +4,7 @@ import net.hybrid.bungee.BungeePlugin;
 import net.hybrid.bungee.data.Mongo;
 import net.hybrid.bungee.utility.CC;
 import net.hybrid.bungee.utility.RankManager;
+import net.hybrid.bungee.utility.Utils;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -17,22 +18,22 @@ import java.util.concurrent.TimeUnit;
 
 public class JoinNetworkManager implements Listener {
 
-    //TODO ADD MUTED CHECK, so if you login and have not seen your mute it will appear on login
-
     @EventHandler
     public void onPostLogin(PostLoginEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        Document document = BungeePlugin.getInstance().getMongo().loadDocument(
+        Mongo mongo = BungeePlugin.getInstance().getMongo();
+
+        Document document = mongo.loadDocument(
                 "playerData", player.getUniqueId());
 
-        if (document.getBoolean("banned")) {
-            Document punishmentDoc = BungeePlugin.getInstance().getMongo().loadDocument(
+        if (document.containsKey("banned") && document.getBoolean("banned")) {
+            Document punishmentDoc = mongo.loadDocument(
                     "punishments", "punishmentId", document.getString("banId")
             );
 
             String reason = punishmentDoc.getString("reason");
 
-            if (punishmentDoc.get("duration").equals("permanent")) {
+            if (punishmentDoc.containsKey("duration") && punishmentDoc.get("duration").equals("permanent")) {
                 player.disconnect(new TextComponent(CC.translate(
                         "&cYou are permanently banned from this server!\n\n" +
                                 "&7Reason: &f" + reason + "\n" +
@@ -41,7 +42,7 @@ public class JoinNetworkManager implements Listener {
                 return;
             }
 
-            String expires = "";
+            String expires = Utils.timeAsString(punishmentDoc.getLong("expires") - System.currentTimeMillis());
 
             player.disconnect(new TextComponent(CC.translate(
                     "&cYou are temporarily banned from this server!\n" +
@@ -52,7 +53,7 @@ public class JoinNetworkManager implements Listener {
             return;
         }
 
-        Document serverDocument = BungeePlugin.getInstance().getMongo().loadDocument("serverData", "serverDataType", "badNameList");
+        Document serverDocument = mongo.loadDocument("serverData", "serverDataType", "badNameList");
         if (serverDocument.containsValue(player.getName().toLowerCase())) {
             player.disconnect(new TextComponent(CC.translate(
                     "&c&lBLACKLISTED USERNAME!\n" +
@@ -63,14 +64,16 @@ public class JoinNetworkManager implements Listener {
             return;
         }
 
-        Document playerDataList = BungeePlugin.getInstance().getMongo().loadDocument("serverData", "serverDataType", "playerDataList");
-        if (BungeePlugin.getInstance().getProxy().getPlayers().size() > playerDataList.getInteger("mostConcurrentAtOnce")) {
-            playerDataList.replace("mostConcurrentAtOnce", BungeePlugin.getInstance().getProxy().getPlayers().size());
+        Document playerDataList = mongo.loadDocument("serverData", "serverDataType", "playerDataList");
+        int count = BungeePlugin.getInstance().getProxy().getOnlineCount();
+        if (count > playerDataList.getInteger("mostConcurrentAtOnce")) {
+            playerDataList.replace("mostConcurrentAtOnce", count);
+            mongo.saveDocument("serverData", playerDataList, "serverDataType", "playerDataList");
         }
 
-        if (document.getBoolean("waitingOnSeeWarning")) {
+        if (document.containsKey("waitingOnSeeWarning") && document.getBoolean("waitingOnSeeWarning")) {
             ProxyServer.getInstance().getScheduler().schedule(BungeePlugin.getInstance(), () -> {
-                Document warningDoc = BungeePlugin.getInstance().getMongo().loadDocument("punishments", "punishmentId",
+                Document warningDoc = mongo.loadDocument("punishments", "punishmentId",
                         document.getString("warningWaitingId"));
 
                 String warningReason = warningDoc.getString("reason");
@@ -85,7 +88,7 @@ public class JoinNetworkManager implements Listener {
                 )));
 
                 player.sendMessage(new TextComponent(CC.translate(
-                        "&cYou have been warned with the reason: &f" + warningReason
+                        "&cYou have been &cwarned with the &creason: &f" + warningReason
                 )));
 
                 player.sendMessage(new TextComponent("  "));
@@ -98,18 +101,60 @@ public class JoinNetworkManager implements Listener {
                         "&7&m-------------------------------------"
                 )));
 
-                BungeePlugin.getInstance().getMongo().saveDocument("punishments", warningDoc, "punishmentId",
+                mongo.saveDocument("punishments", warningDoc, "punishmentId",
                         document.getString("warningWaitingId"));
 
                 document.replace("waitingOnSeeWarning", false);
                 document.replace("warningWaitingId", "");
-                BungeePlugin.getInstance().getMongo().saveDocument("playerData", document, player.getUniqueId());
+                mongo.saveDocument("playerData", document, player.getUniqueId());
             }, 2, TimeUnit.SECONDS);
+        }
+
+        if (document.containsKey("muted") && document.getBoolean("muted") && !document.getString("muteId").equalsIgnoreCase("")) {
+            Document punishmentDoc = mongo.loadDocument("punishments", "punishmentId", document.getString("muteId"));
+
+            if (punishmentDoc.getLong("expires") > System.currentTimeMillis() && !punishmentDoc.getBoolean("playerHasSeen")) {
+                punishmentDoc.replace("playerHasSeen", true);
+                mongo.saveDocument("punishments", punishmentDoc, "punishmentId", document.getString("muteId"));
+
+                StringBuilder reason = new StringBuilder();
+                for (String s : punishmentDoc.getString("reason").split(" ")) {
+                    reason.append("§c").append(s).append(" ");
+                }
+
+                ProxyServer.getInstance().getScheduler().schedule(BungeePlugin.getInstance(), () -> {
+                    player.sendMessage(new TextComponent(CC.translate(
+                            "&7&m-----------------&7&m--------------------"
+                    )));
+
+                    player.sendMessage(new TextComponent(CC.translate(
+                            "&c&lYOU HAVE BEEN &c&lMUTED BY STAFF!"
+                    )));
+
+                    player.sendMessage(new TextComponent(CC.translate(
+                            "&cYou have been &cmuted for &c" + reason.toString().trim()
+                    )));
+
+                    player.sendMessage(new TextComponent("  "));
+
+                    player.sendMessage(new TextComponent(CC.translate(
+                            "&7Your mute &7expires in &f" + Utils.timeAsString(punishmentDoc.getLong("expires") - System.currentTimeMillis())
+                    )));
+
+                    player.sendMessage(new TextComponent(CC.translate(
+                            "&7Punished falsely? Create a &7ticket at &b&nhttps://hybridplays.com/discord &7and explain &7the situation."
+                    )));
+
+                    player.sendMessage(new TextComponent(CC.translate(
+                            "&7&m----------------&7&m---------------------"
+                    )));
+                }, 2, TimeUnit.SECONDS);
+            }
         }
 
         if (!document.getString("staffRank").equalsIgnoreCase("")
                 || !document.getString("specialRank").equalsIgnoreCase("")) {
-            for (UUID targetUuid : BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode()) {
+            for (UUID targetUuid : mongo.getStaffOnNotifyMode()) {
                 ProxiedPlayer target = BungeePlugin.getInstance().getProxy().getPlayer(targetUuid);
 
                 target.sendMessage(new TextComponent(CC.translate(
@@ -128,28 +173,28 @@ public class JoinNetworkManager implements Listener {
 
         if (!document.getString("staffRank").equalsIgnoreCase("")
             && document.getBoolean("staffNotifyMode")) {
-            BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode().add(player.getUniqueId());
+            mongo.getStaffOnNotifyMode().add(player.getUniqueId());
         }
 
         if (!document.getString("staffRank").equalsIgnoreCase("")) {
-            BungeePlugin.getInstance().getMongo().getStaff().add(player.getUniqueId());
+            mongo.getStaff().add(player.getUniqueId());
         }
 
         if (document.getString("staffRank").equalsIgnoreCase("owner")) {
-            BungeePlugin.getInstance().getMongo().getAdmins().add(player.getUniqueId());
-            BungeePlugin.getInstance().getMongo().getOwners().add(player.getUniqueId());
+            mongo.getAdmins().add(player.getUniqueId());
+            mongo.getOwners().add(player.getUniqueId());
 
             document.replace("lastLogin", System.currentTimeMillis());
-            BungeePlugin.getInstance().getMongo().saveDocument("playerData", document, player.getUniqueId());
+            mongo.saveDocument("playerData", document, player.getUniqueId());
             return;
         }
 
         if (document.getString("staffRank").equalsIgnoreCase("admin")) {
-            BungeePlugin.getInstance().getMongo().getAdmins().add(player.getUniqueId());
+            mongo.getAdmins().add(player.getUniqueId());
         }
 
         document.replace("lastLogin", System.currentTimeMillis());
-        BungeePlugin.getInstance().getMongo().saveDocument("playerData", document, player.getUniqueId());
+        mongo.saveDocument("playerData", document, player.getUniqueId());
     }
 }
 
