@@ -2,6 +2,7 @@ package net.hybrid.bungee.managers;
 
 import net.hybrid.bungee.BungeePlugin;
 import net.hybrid.bungee.data.Mongo;
+import net.hybrid.bungee.data.mysql.MySQL;
 import net.hybrid.bungee.utility.CC;
 import net.hybrid.bungee.utility.RankManager;
 import net.hybrid.bungee.utility.Utils;
@@ -13,6 +14,8 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import org.bson.Document;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -152,8 +155,8 @@ public class JoinNetworkManager implements Listener {
             }
         }
 
-        if (!document.getString("staffRank").equalsIgnoreCase("")
-                || !document.getString("specialRank").equalsIgnoreCase("")) {
+        if ((!document.getString("staffRank").equalsIgnoreCase("")
+                || !document.getString("specialRank").equalsIgnoreCase("")) && !document.getBoolean("banned")) {
             for (UUID targetUuid : mongo.getStaffOnNotifyMode()) {
                 ProxiedPlayer target = BungeePlugin.getInstance().getProxy().getPlayer(targetUuid);
 
@@ -195,6 +198,16 @@ public class JoinNetworkManager implements Listener {
 
         document.replace("lastLogin", System.currentTimeMillis());
         mongo.saveDocument("playerData", document, player.getUniqueId());
+
+        MySQL sql = BungeePlugin.getInstance().getMySql();
+        try {
+            PreparedStatement ps = sql.getConnection().prepareStatement("UPDATE data SET online_count=? WHERE data=?");
+            ps.setInt(1, BungeePlugin.getInstance().getProxy().getOnlineCount());
+            ps.setString(2, "networkData");
+            ps.executeUpdate();
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
     }
 }
 
