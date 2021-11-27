@@ -625,6 +625,52 @@ public class MessageListener implements Listener {
                 BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode().add(UUID.fromString(issuerUUID));
             }
         }
+
+        if (subChannel.equalsIgnoreCase("ClearChatIssued")) {
+            final String serverValue = in.readUTF();
+            final String updateValue = in.readUTF();
+            final String issuerUUID = in.readUTF();
+            final String reason = in.readUTF();
+            final String punishmentId = in.readUTF();
+
+            if (!serverValue.equalsIgnoreCase("ONLINE") &&
+                    !updateValue.equalsIgnoreCase("ClearChatIssued")) return;
+
+            if (issuerUUID.equalsIgnoreCase("CONSOLE")) return;
+
+            RankManager rankManager = new RankManager(UUID.fromString(issuerUUID));
+
+            boolean value = false;
+
+            if (BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode().contains(UUID.fromString(issuerUUID))) {
+                BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode().remove(UUID.fromString(issuerUUID));
+                value = true;
+            }
+
+            String server = BungeePlugin.getInstance().getProxy().getPlayer(UUID.fromString(issuerUUID)).getServer().getInfo().getName();
+
+            StringBuilder finalReason = new StringBuilder();
+            for (String s : reason.split(" ")) {
+                finalReason.append("§6").append(s).append(" ");
+            }
+
+            for (UUID targetStaff : BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode()) {
+                ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(targetStaff);
+                targetPlayer.sendMessage(new TextComponent(
+                        ChatChannel.STAFF.getPrefix() + " " + rankManager.getRank().getPrefixSpace() + rankManager.getColoredName() + CC.translate(
+                                " &acleared the chat on server '§f" + server + "§a' &awith reason: &6" + finalReason.toString().trim()
+                        )
+                ));
+            }
+
+            if (value) {
+                BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode().add(UUID.fromString(issuerUUID));
+            }
+
+            Document document = mongo.loadDocument("punishments", "punishmentId", punishmentId);
+            document.replace("serverIssuedOn", server);
+            mongo.saveDocument("punishments", document, "punishmentId", punishmentId);
+        }
     }
 
     public TextComponent getPunishedMessage(String reason) {
@@ -672,6 +718,8 @@ public class MessageListener implements Listener {
 
         return component;
     }
+
+
 
 }
 

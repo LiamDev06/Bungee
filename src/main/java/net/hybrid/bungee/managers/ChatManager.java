@@ -31,7 +31,7 @@ public class ChatManager implements Listener {
             for (UUID target : BungeePlugin.getInstance().getMongo().getOwners()) {
                 ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(target);
                 targetPlayer.sendMessage(new TextComponent(
-                        ChatChannel.OWNER.getPrefix() + " " + rankManager.getColoredName() + "§f: " + CC.translate(event.getMessage())
+                        ChatChannel.OWNER.getPrefix() + " " + rankManager.getColoredName() + "§f: " + CC.translate(replaceWithEmote(event.getMessage()))
                 ));
             }
             return;
@@ -43,7 +43,7 @@ public class ChatManager implements Listener {
             for (UUID target : BungeePlugin.getInstance().getMongo().getAdmins()) {
                 ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(target);
                 targetPlayer.sendMessage(new TextComponent(
-                        ChatChannel.ADMIN.getPrefix() + " " + rankManager.getColoredName() + "§f: " + CC.translate(event.getMessage())
+                        ChatChannel.ADMIN.getPrefix() + " " + rankManager.getColoredName() + "§f: " + CC.translate(replaceWithEmote(event.getMessage()))
                 ));
             }
             return;
@@ -55,7 +55,7 @@ public class ChatManager implements Listener {
             for (UUID target : BungeePlugin.getInstance().getMongo().getStaff()) {
                 ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(target);
                 targetPlayer.sendMessage(new TextComponent(
-                        ChatChannel.STAFF.getPrefix() + " " + rankManager.getColoredName() + "§f: " + CC.translate(event.getMessage())
+                        ChatChannel.STAFF.getPrefix() + " " + rankManager.getColoredName() + "§f: " + CC.translate(replaceWithEmote(event.getMessage()))
                 ));
             }
         }
@@ -66,7 +66,7 @@ public class ChatManager implements Listener {
         for (UUID target : BungeePlugin.getInstance().getMongo().getOwners()) {
             ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(target);
             targetPlayer.sendMessage(new TextComponent(
-                    ChatChannel.OWNER.getPrefix() + " " + rankManager.getColoredName() + "§f: " + CC.translate(message)
+                    ChatChannel.OWNER.getPrefix() + " " + rankManager.getColoredName() + "§f: " + CC.translate(replaceWithEmote(message))
             ));
         }
     }
@@ -75,7 +75,7 @@ public class ChatManager implements Listener {
         for (UUID target : BungeePlugin.getInstance().getMongo().getAdmins()) {
             ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(target);
             targetPlayer.sendMessage(new TextComponent(
-                    ChatChannel.ADMIN.getPrefix() + " " + rankManager.getColoredName() + "§f: " + CC.translate(message)
+                    ChatChannel.ADMIN.getPrefix() + " " + rankManager.getColoredName() + "§f: " + CC.translate(replaceWithEmote(message))
             ));
         }
     }
@@ -84,9 +84,26 @@ public class ChatManager implements Listener {
         for (UUID target : BungeePlugin.getInstance().getMongo().getStaff()) {
             ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(target);
             targetPlayer.sendMessage(new TextComponent(
-                    ChatChannel.STAFF.getPrefix() + " " + rankManager.getColoredName() + "§f: " + CC.translate(message)
+                    ChatChannel.STAFF.getPrefix() + " " + rankManager.getColoredName() + "§f: " + CC.translate(replaceWithEmote(message))
             ));
         }
+    }
+
+    public static String replaceWithEmote(String input) {
+
+        input = input.replace(":cool:", CC.translate("&a&lCool&r"));
+        input = input.replace(":shrug:", CC.translate("&d¯\\_(ツ)_/¯&r"));
+        input = input.replace(":wow:", CC.translate("&b&lW&4&lO&b&lW&r"));
+        input = input.replace("o/", CC.translate("&5(o_o)/&r"));
+        input = input.replace(":hybrid:", CC.translate("&2&lHYBRID&r"));
+        input = input.replace(":L:", CC.translate("&c&lL&r"));
+        input = input.replace(":sad:", CC.translate("&e◕︵◕&r"));
+        input = input.replace(":happy:", CC.translate("&6&l◕◡◕&r"));
+        input = input.replace(":embarrassed:", CC.translate("&b⊙﹏⊙&r"));
+        input = input.replace(":eyes:", CC.translate("&aʘ.ʘ&r"));
+        input = input.replace(":hehe:", CC.translate("&0hehe&r"));
+
+        return input;
     }
 
 }

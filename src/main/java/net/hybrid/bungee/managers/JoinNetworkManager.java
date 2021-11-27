@@ -176,7 +176,9 @@ public class JoinNetworkManager implements Listener {
 
         if (!document.getString("staffRank").equalsIgnoreCase("")
             && document.getBoolean("staffNotifyMode")) {
-            mongo.getStaffOnNotifyMode().add(player.getUniqueId());
+            if (!mongo.getStaffOnNotifyMode().contains(player.getUniqueId())) {
+                mongo.getStaffOnNotifyMode().add(player.getUniqueId());
+            }
         }
 
         if (!document.getString("staffRank").equalsIgnoreCase("")) {
@@ -198,16 +200,6 @@ public class JoinNetworkManager implements Listener {
 
         document.replace("lastLogin", System.currentTimeMillis());
         mongo.saveDocument("playerData", document, player.getUniqueId());
-
-        MySQL sql = BungeePlugin.getInstance().getMySql();
-        try {
-            PreparedStatement ps = sql.getConnection().prepareStatement("UPDATE data SET online_count=? WHERE data=?");
-            ps.setInt(1, BungeePlugin.getInstance().getProxy().getOnlineCount());
-            ps.setString(2, "networkData");
-            ps.executeUpdate();
-        } catch (SQLException exception) {
-            exception.printStackTrace();
-        }
     }
 }
 
