@@ -14,18 +14,20 @@ public class Party {
 
     // The ones in the party
     private final List<UUID> members;
-    private final List<UUID> moderators;
-    private final List<UUID> admins;
+    private final List<UUID> guides;
 
-    // Invites            Who   Sent
+    // Invites            To   Sent
     private final HashMap<UUID, Long> outgoingInvites;
+
+    // Muted Members
+    private final List<UUID> mutedMembers;
 
     public Party(UUID leader) {
         this.leader = leader;
 
         this.members = new ArrayList<>();
-        this.moderators = new ArrayList<>();
-        this.admins = new ArrayList<>();
+        this.guides = new ArrayList<>();
+        this.mutedMembers = new ArrayList<>();
 
         this.outgoingInvites = new HashMap<>();
     }
@@ -42,12 +44,12 @@ public class Party {
         return members;
     }
 
-    public List<UUID> getAdmins() {
-        return admins;
+    public List<UUID> getGuides() {
+        return guides;
     }
 
-    public List<UUID> getModerators() {
-        return moderators;
+    public List<UUID> getMutedMembers() {
+        return mutedMembers;
     }
 
     public HashMap<UUID, Long> getOutgoingInvites() {
@@ -80,30 +82,29 @@ public class Party {
         return this;
     }
 
-    public Party addAdmin(UUID who) {
-        if (!admins.contains(who)) {
-            admins.add(who);
+    public Party addGuide(UUID who) {
+        if (!guides.contains(who)) {
+            guides.add(who);
         }
 
         return this;
     }
 
-    public Party removeAdmin(UUID who) {
-        admins.remove(who);
-
+    public Party removeGuide(UUID who) {
+        guides.remove(who);
         return this;
     }
 
-    public Party addModerator(UUID who) {
-        if (!moderators.contains(who)) {
-            moderators.add(who);
+    public Party muteUser(UUID who) {
+        if (!mutedMembers.contains(who)) {
+            mutedMembers.add(who);
         }
 
         return this;
     }
 
-    public Party removeModerator(UUID who) {
-        moderators.remove(who);
+    public Party unmuteUser(UUID who) {
+        mutedMembers.remove(who);
         return this;
     }
 

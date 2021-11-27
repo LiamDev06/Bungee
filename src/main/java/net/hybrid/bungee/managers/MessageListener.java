@@ -98,12 +98,21 @@ public class MessageListener implements Listener {
 
             ProxiedPlayer against = BungeePlugin.getInstance().getProxy().getPlayer(UUID.fromString(againstUUID));
             if (against != null) {
+                TextComponent punish = getPunishedMessage(reason);
+                if (punish != null) {
+                    for (ProxiedPlayer target : against.getServer().getInfo().getPlayers()) {
+                        target.sendMessage(punish);
+                    }
+                }
+
                 against.disconnect(new TextComponent(CC.translate(
                         "&cYou have been permanently banned from this server!\n\n" +
                                 "&7Reason: &f" + reason + "\n" +
                                 "&7Punished falsely? Create a ticket at &b&nhttps://hybridplays.com/discord &7and explain &7the situation."
                 )));
             }
+
+            if (issuerUUID.equalsIgnoreCase("CONSOLE")) return;
 
             RankManager rankManager = new RankManager(UUID.fromString(issuerUUID));
             RankManager againstManager = new RankManager(UUID.fromString(againstUUID));
@@ -145,6 +154,8 @@ public class MessageListener implements Listener {
             if (!serverValue.equalsIgnoreCase("ONLINE") &&
                     !updateValue.equalsIgnoreCase("UnbanIssued")) return;
 
+            if (issuerUUID.equalsIgnoreCase("CONSOLE")) return;
+
             RankManager rankManager = new RankManager(UUID.fromString(issuerUUID));
             RankManager againstManager = new RankManager(UUID.fromString(againstUUID));
 
@@ -184,6 +195,8 @@ public class MessageListener implements Listener {
 
             if (!serverValue.equalsIgnoreCase("ONLINE") &&
                     !updateValue.equalsIgnoreCase("UnmuteIssued")) return;
+
+            if (issuerUUID.equalsIgnoreCase("CONSOLE")) return;
 
             RankManager rankManager = new RankManager(UUID.fromString(issuerUUID));
             RankManager againstManager = new RankManager(UUID.fromString(againstUUID));
@@ -257,6 +270,8 @@ public class MessageListener implements Listener {
                                 "&cThis player is not online!"
                         )));
             }
+
+            if (issuerUUID.equalsIgnoreCase("CONSOLE")) return;
 
             RankManager rankManager = new RankManager(UUID.fromString(issuerUUID));
             RankManager againstManager = new RankManager(UUID.fromString(againstUUID));
@@ -343,6 +358,8 @@ public class MessageListener implements Listener {
                 }
             }
 
+            if (issuerUUID.equalsIgnoreCase("CONSOLE")) return;
+
             RankManager rankManager = new RankManager(UUID.fromString(issuerUUID));
             RankManager againstManager = new RankManager(UUID.fromString(againstUUID));
 
@@ -393,6 +410,8 @@ public class MessageListener implements Listener {
                 )));
             }
 
+            if (issuerUUID.equalsIgnoreCase("CONSOLE")) return;
+
             RankManager rankManager = new RankManager(UUID.fromString(issuerUUID));
             RankManager againstManager = new RankManager(UUID.fromString(againstUUID));
 
@@ -427,6 +446,7 @@ public class MessageListener implements Listener {
             if (!serverValue.equalsIgnoreCase("ONLINE") &&
                     !updateValue.equalsIgnoreCase("BadNameRemoved")) return;
 
+            if (issuerUUID.equalsIgnoreCase("CONSOLE")) return;
             RankManager rankManager = new RankManager(UUID.fromString(issuerUUID));
 
             boolean value = false;
@@ -506,6 +526,8 @@ public class MessageListener implements Listener {
                 )));
             }
 
+            if (issuerUUID.equalsIgnoreCase("CONSOLE")) return;
+
             RankManager rankManager = new RankManager(UUID.fromString(issuerUUID));
             RankManager againstManager = new RankManager(UUID.fromString(againstUUID));
 
@@ -554,12 +576,21 @@ public class MessageListener implements Listener {
 
             ProxiedPlayer against = BungeePlugin.getInstance().getProxy().getPlayer(UUID.fromString(againstUUID));
             if (against != null) {
+                TextComponent punish = getPunishedMessage(reason);
+                if (punish != null) {
+                    for (ProxiedPlayer target : against.getServer().getInfo().getPlayers()) {
+                        target.sendMessage(punish);
+                    }
+                }
+
                 against.disconnect(new TextComponent(CC.translate(
                         "&cYou have been temporarily banned for &f" + expiresNormal + " &cfrom this server!\n\n" +
                                 "&7Reason: &f" + reason + "\n" +
                                 "&7Punished falsely? Create a ticket at &b&nhttps://hybridplays.com/discord &7and explain &7the situation."
                 )));
             }
+
+            if (issuerUUID.equalsIgnoreCase("CONSOLE")) return;
 
             RankManager rankManager = new RankManager(UUID.fromString(issuerUUID));
             RankManager againstManager = new RankManager(UUID.fromString(againstUUID));
@@ -595,4 +626,59 @@ public class MessageListener implements Listener {
             }
         }
     }
+
+    public TextComponent getPunishedMessage(String reason) {
+        TextComponent component = null;
+
+        if (reason.equalsIgnoreCase("Cheating through the use of modifications that results in an unfair advantage")) {
+            component = new TextComponent(CC.translate(
+                    "&7&m----------------------------------\n" +
+                       "&c&lSomeone was banned and removed from your server for &6&lCHEATING&c&l! GG :D\n" +
+                       "&7&m----------------------------------"
+            ));
+        }
+
+        if (reason.equalsIgnoreCase("Alt-account punishment evading")) {
+            component = new TextComponent(CC.translate(
+                    "&7&m----------------------------------\n" +
+                            "&c&lSomeone was banned and removed from your server for &6&lPUNISHMENT EVADING&c&l! GG :D\n" +
+                            "&7&m----------------------------------"
+            ));
+        }
+
+        if (reason.equalsIgnoreCase("Abusing glitches, bugs and/or exploits intentionally")) {
+            component = new TextComponent(CC.translate(
+                    "&7&m----------------------------------\n" +
+                            "&c&lSomeone was banned and removed from your server for &6&lEXPLOITING&c&l! GG :D\n" +
+                            "&7&m----------------------------------"
+            ));
+        }
+
+        if (reason.equalsIgnoreCase("Intentionally sabotaging the game for other players")) {
+            component = new TextComponent(CC.translate(
+                    "&7&m----------------------------------\n" +
+                            "&c&lSomeone was banned and removed from your server for &6&lGAME SABOTAGING&c&l! GG :D\n" +
+                            "&7&m----------------------------------"
+            ));
+        }
+
+        if (reason.equalsIgnoreCase("Game sabotaging in the form of cross-teaming")) {
+            component = new TextComponent(CC.translate(
+                    "&7&m----------------------------------\n" +
+                            "&c&lSomeone was banned and removed from your server for &6&lCROSS-TEAMING&c&l! GG :D\n" +
+                            "&7&m----------------------------------"
+            ));
+        }
+
+        return component;
+    }
+
 }
+
+
+
+
+
+
+
+

@@ -2,6 +2,7 @@ package net.hybrid.bungee;
 
 import net.hybrid.bungee.commands.*;
 import net.hybrid.bungee.data.Mongo;
+import net.hybrid.bungee.data.mysql.MySQL;
 import net.hybrid.bungee.managers.*;
 import net.hybrid.bungee.party.PartyCommand;
 import net.hybrid.bungee.party.PartyManager;
@@ -13,6 +14,7 @@ public class BungeePlugin extends Plugin {
     private static BungeePlugin INSTANCE;
     private Mongo mongo;
     private PartyManager partyManager;
+    private MySQL mySql;
 
     @Override
     public void onEnable(){
@@ -21,6 +23,13 @@ public class BungeePlugin extends Plugin {
 
         mongo = new Mongo(this);
         partyManager = new PartyManager();
+
+        mySql = new MySQL();
+        mySql.connect();
+
+        if (mySql.isConnected()) {
+            getProxy().getLogger().info("Bungee Database (network systems) was successfully connected!");
+        }
 
         PluginManager manager = getProxy().getPluginManager();
 
@@ -48,6 +57,12 @@ public class BungeePlugin extends Plugin {
     @Override
     public void onDisable(){
         INSTANCE = null;
+
+        mySql.disconnect();
+        if (!mySql.isConnected()) {
+            getProxy().getLogger().info("Database was successfully disconnected!");
+        }
+
         getLogger().info("Hybrid Bungee system has SUCCESSFULLY been disabled.");
     }
 
@@ -61,6 +76,10 @@ public class BungeePlugin extends Plugin {
 
     public PartyManager getPartyManager() {
         return partyManager;
+    }
+
+    public MySQL getMySql() {
+        return mySql;
     }
 }
 
