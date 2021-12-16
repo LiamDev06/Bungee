@@ -1,10 +1,13 @@
 package net.hybrid.bungee.managers;
 
 import net.hybrid.bungee.BungeePlugin;
+import net.hybrid.bungee.data.Mongo;
+import net.hybrid.bungee.party.Party;
 import net.hybrid.bungee.utility.CC;
 import net.hybrid.bungee.utility.ChatChannel;
 import net.hybrid.bungee.utility.ChatChannelManager;
 import net.hybrid.bungee.utility.RankManager;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
@@ -15,6 +18,9 @@ import java.util.UUID;
 
 public class ChatManager implements Listener {
 
+    private static final ProxyServer proxy = BungeePlugin.getInstance().getProxy();
+    private static final Mongo mongo = BungeePlugin.getInstance().getMongo();
+
     @EventHandler
     public void onChat(ChatEvent event) {
         if (event.isProxyCommand()) return;
@@ -23,13 +29,37 @@ public class ChatManager implements Listener {
 
         ProxiedPlayer player = (ProxiedPlayer) event.getSender();
         RankManager rankManager = new RankManager(player.getUniqueId());
-        ChatChannelManager chatChannelManager = new ChatChannelManager(player.getUniqueId());
+        ChatChannel chatChannel = new ChatChannelManager(player.getUniqueId()).getChatChannel();
 
-        if (chatChannelManager.getChatChannel() == ChatChannel.OWNER) {
+        if (chatChannel == ChatChannel.PARTY) {
             event.setCancelled(true);
 
-            for (UUID target : BungeePlugin.getInstance().getMongo().getOwners()) {
-                ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(target);
+            Party party = BungeePlugin.getInstance().getPartyManager().findPartyFromMember(player.getUniqueId());
+            if (party == null) {
+                player.sendMessage(new TextComponent(CC.translate(
+                        "&cYou &care &cnot &ccurrently &cin &ca &cparty!"
+                )));
+                return;
+            }
+
+            for (UUID target : party.getMembers()) {
+                ProxiedPlayer targetPlayer = proxy.getPlayer(target);
+
+                targetPlayer.sendMessage(new TextComponent(
+                        ChatChannel.PARTY.getPrefix() + " " + rankManager.getColoredName() + "§f: " + replaceWithEmote(event.getMessage())
+                ));
+            }
+
+            proxy.getPlayer(party.getLeader()).sendMessage(new TextComponent(
+                    ChatChannel.PARTY.getPrefix() + " " + rankManager.getColoredName() + "§f: " + replaceWithEmote(event.getMessage())
+            ));
+        }
+
+        if (chatChannel == ChatChannel.OWNER) {
+            event.setCancelled(true);
+
+            for (UUID target : mongo.getOwners()) {
+                ProxiedPlayer targetPlayer = proxy.getPlayer(target);
                 targetPlayer.sendMessage(new TextComponent(
                         ChatChannel.OWNER.getPrefix() + " " + rankManager.getColoredName() + "§f: " + CC.translate(replaceWithEmote(event.getMessage()))
                 ));
@@ -37,11 +67,11 @@ public class ChatManager implements Listener {
             return;
         }
 
-        if (chatChannelManager.getChatChannel() == ChatChannel.ADMIN) {
+        if (chatChannel == ChatChannel.ADMIN) {
             event.setCancelled(true);
 
-            for (UUID target : BungeePlugin.getInstance().getMongo().getAdmins()) {
-                ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(target);
+            for (UUID target : mongo.getAdmins()) {
+                ProxiedPlayer targetPlayer = proxy.getPlayer(target);
                 targetPlayer.sendMessage(new TextComponent(
                         ChatChannel.ADMIN.getPrefix() + " " + rankManager.getColoredName() + "§f: " + CC.translate(replaceWithEmote(event.getMessage()))
                 ));
@@ -49,11 +79,11 @@ public class ChatManager implements Listener {
             return;
         }
 
-        if (chatChannelManager.getChatChannel() == ChatChannel.STAFF) {
+        if (chatChannel == ChatChannel.STAFF) {
             event.setCancelled(true);
 
-            for (UUID target : BungeePlugin.getInstance().getMongo().getStaff()) {
-                ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(target);
+            for (UUID target : mongo.getStaff()) {
+                ProxiedPlayer targetPlayer = proxy.getPlayer(target);
                 targetPlayer.sendMessage(new TextComponent(
                         ChatChannel.STAFF.getPrefix() + " " + rankManager.getColoredName() + "§f: " + CC.translate(replaceWithEmote(event.getMessage()))
                 ));
@@ -63,8 +93,8 @@ public class ChatManager implements Listener {
     }
 
     public static void sendOwnerChatMessage(String message, RankManager rankManager) {
-        for (UUID target : BungeePlugin.getInstance().getMongo().getOwners()) {
-            ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(target);
+        for (UUID target : mongo.getOwners()) {
+            ProxiedPlayer targetPlayer = proxy.getPlayer(target);
             targetPlayer.sendMessage(new TextComponent(
                     ChatChannel.OWNER.getPrefix() + " " + rankManager.getColoredName() + "§f: " + CC.translate(replaceWithEmote(message))
             ));
@@ -72,8 +102,8 @@ public class ChatManager implements Listener {
     }
 
     public static void sendAdminChatMessage(String message, RankManager rankManager) {
-        for (UUID target : BungeePlugin.getInstance().getMongo().getAdmins()) {
-            ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(target);
+        for (UUID target : mongo.getAdmins()) {
+            ProxiedPlayer targetPlayer = proxy.getPlayer(target);
             targetPlayer.sendMessage(new TextComponent(
                     ChatChannel.ADMIN.getPrefix() + " " + rankManager.getColoredName() + "§f: " + CC.translate(replaceWithEmote(message))
             ));
@@ -81,8 +111,8 @@ public class ChatManager implements Listener {
     }
 
     public static void sendStaffChatMessage(String message, RankManager rankManager) {
-        for (UUID target : BungeePlugin.getInstance().getMongo().getStaff()) {
-            ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(target);
+        for (UUID target : mongo.getStaff()) {
+            ProxiedPlayer targetPlayer = proxy.getPlayer(target);
             targetPlayer.sendMessage(new TextComponent(
                     ChatChannel.STAFF.getPrefix() + " " + rankManager.getColoredName() + "§f: " + CC.translate(replaceWithEmote(message))
             ));

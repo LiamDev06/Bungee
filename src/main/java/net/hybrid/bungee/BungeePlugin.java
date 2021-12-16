@@ -4,17 +4,19 @@ import net.hybrid.bungee.commands.*;
 import net.hybrid.bungee.data.Mongo;
 import net.hybrid.bungee.data.mysql.MySQL;
 import net.hybrid.bungee.managers.*;
-import net.hybrid.bungee.party.PartyCommand;
-import net.hybrid.bungee.party.PartyManager;
+import net.hybrid.bungee.party.*;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
+
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class BungeePlugin extends Plugin {
 
     private static BungeePlugin INSTANCE;
     private Mongo mongo;
     private PartyManager partyManager;
-    private MySQL mySql;
 
     @Override
     public void onEnable(){
@@ -23,13 +25,6 @@ public class BungeePlugin extends Plugin {
 
         mongo = new Mongo(this);
         partyManager = new PartyManager();
-
-        mySql = new MySQL();
-        mySql.connect();
-
-        if (mySql.isConnected()) {
-            getProxy().getLogger().info("Bungee Database (network systems) was successfully connected!");
-        }
 
         PluginManager manager = getProxy().getPluginManager();
 
@@ -50,19 +45,28 @@ public class BungeePlugin extends Plugin {
         manager.registerListener(this, new LeaveNetworkManager());
         manager.registerListener(this, new JoinNetworkManager());
         manager.registerListener(this, new ServerShutdownListener());
+        manager.registerListener(this, new PartyListener());
+
+        getProxy().getScheduler().schedule(this, () -> {
+            for (Party party : partyManager.getParties().values()) {
+                for (UUID uuid : party.getOutgoingInvites().keySet()) {
+
+                    if (System.currentTimeMillis() > party.getOutgoingInvites().get(uuid)) {
+                        PartyUtils.sendInviteExpired(uuid, party);
+                    }
+                }
+            }
+
+        }, 0, 1, TimeUnit.SECONDS);
 
         getLogger().info("Hybrid Bungee system has been SUCCESSFULLY loaded in " + (System.currentTimeMillis() - time) + "ms!");
     }
 
     @Override
     public void onDisable(){
+        mongo.getMongoClient().close();
+
         INSTANCE = null;
-
-        mySql.disconnect();
-        if (!mySql.isConnected()) {
-            getProxy().getLogger().info("Database was successfully disconnected!");
-        }
-
         getLogger().info("Hybrid Bungee system has SUCCESSFULLY been disabled.");
     }
 
@@ -76,10 +80,6 @@ public class BungeePlugin extends Plugin {
 
     public PartyManager getPartyManager() {
         return partyManager;
-    }
-
-    public MySQL getMySql() {
-        return mySql;
     }
 }
 

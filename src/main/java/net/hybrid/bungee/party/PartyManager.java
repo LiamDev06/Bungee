@@ -16,7 +16,7 @@ public class PartyManager {
             return this.parties.get(partyLeader);
         }
 
-        return new Party(partyLeader);
+        return null;
     }
 
     public HashMap<UUID, Party> getParties() {
@@ -24,10 +24,44 @@ public class PartyManager {
     }
 
     public Party findPartyFromMember(UUID who) {
+        if (parties.containsKey(who)) {
+            return parties.get(who);
+        }
+
         for (UUID uuid : parties.keySet()) {
             Party party = parties.get(uuid);
 
             if (party.getMembers().contains(who)) return party;
+        }
+
+        return null;
+    }
+
+    public Party findPartyFromGuideOrLeader(UUID who) {
+        if (parties.containsKey(who)) {
+            return parties.get(who);
+        }
+
+        for (UUID uuid : parties.keySet()) {
+            Party party = parties.get(uuid);
+
+            if (party.getGuides().contains(who)) return party;
+            if (party.getLeader() == who) return party;
+        }
+
+        return null;
+    }
+
+    public Party findPartyFromMemberOrOutgoingInvites(UUID who) {
+        if (parties.containsKey(who)) {
+            return parties.get(who);
+        }
+
+        for (UUID uuid : parties.keySet()) {
+            Party party = parties.get(uuid);
+
+            if (party.getMembers().contains(who)) return party;
+            if (party.getOutgoingInvites().containsKey(who)) return party;
         }
 
         return null;

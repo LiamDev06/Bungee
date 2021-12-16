@@ -40,6 +40,7 @@ public class Party {
         this.leader = leader;
     }
 
+    // Will not contain the leader but will contain guides
     public List<UUID> getMembers() {
         return members;
     }
@@ -58,7 +59,7 @@ public class Party {
 
     public Party addOutgoingInvite(UUID to) {
         if (!outgoingInvites.containsKey(to)) {
-            outgoingInvites.put(to, System.currentTimeMillis());
+            outgoingInvites.put(to, (System.currentTimeMillis() + 60_000));
         }
 
         return this;
@@ -113,15 +114,18 @@ public class Party {
         return outgoingInvites.get(to) > System.currentTimeMillis();
     }
 
-    public void save() {
-        HashMap<UUID, Party> parties = BungeePlugin.getInstance().getPartyManager().getParties();
+    public void disband() {
+        BungeePlugin.getInstance().getPartyManager().getParties().remove(leader);
+    }
 
-        if (parties.containsKey(leader)) {
-            parties.replace(leader, this);
-            return;
+    public Party save() {
+        if (BungeePlugin.getInstance().getPartyManager().getParties().containsKey(leader)) {
+            BungeePlugin.getInstance().getPartyManager().getParties().replace(leader, this);
+            return this;
         }
 
-        parties.put(leader, this);
+        BungeePlugin.getInstance().getPartyManager().getParties().put(leader, this);
+        return this;
     }
 
 }

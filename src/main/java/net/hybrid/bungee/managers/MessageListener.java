@@ -671,6 +671,47 @@ public class MessageListener implements Listener {
             document.replace("serverIssuedOn", server);
             mongo.saveDocument("punishments", document, "punishmentId", punishmentId);
         }
+
+        if (subChannel.equalsIgnoreCase("PlayerReportIssued")) {
+            final String serverValue = in.readUTF();
+            final String updateValue = in.readUTF();
+            final String issuerUUID = in.readUTF();
+            final String againstUUID = in.readUTF();
+            final String reason = in.readUTF();
+            final String againstName = in.readUTF();
+
+            if (!serverValue.equalsIgnoreCase("ONLINE") &&
+                    !updateValue.equalsIgnoreCase("PlayerReportIssued")) return;
+
+            if (issuerUUID.equalsIgnoreCase("CONSOLE")) return;
+
+            RankManager rankManager = new RankManager(UUID.fromString(issuerUUID));
+            RankManager rankAgainst = new RankManager(UUID.fromString(againstUUID));
+
+            boolean value = false;
+
+            if (BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode().contains(UUID.fromString(issuerUUID))) {
+                BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode().remove(UUID.fromString(issuerUUID));
+                value = true;
+            }
+
+            StringBuilder finalReason = new StringBuilder();
+            for (String s : reason.split(" ")) {
+                finalReason.append("§6").append(s).append(" ");
+            }
+
+            for (UUID targetStaff : BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode()) {
+                ProxiedPlayer targetPlayer = BungeePlugin.getInstance().getProxy().getPlayer(targetStaff);
+                targetPlayer.sendMessage(new TextComponent(CC.translate(
+                        "&6[&6R&6E&6P&6O&6R&6T&6]" + " " + rankManager.getRank().getPrefixSpace() + rankManager.getColoredName() + " &aiss&aued &aa &anew &are&aport &afor " +
+                                rankAgainst.getRank().getPrefixSpace() + againstName + "&a, &awith &athe &area&ason&a: " + finalReason.toString().trim()
+                )));
+            }
+
+            if (value) {
+                BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode().add(UUID.fromString(issuerUUID));
+            }
+        }
     }
 
     public TextComponent getPunishedMessage(String reason) {

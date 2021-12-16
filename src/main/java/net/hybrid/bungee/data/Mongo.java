@@ -14,6 +14,7 @@ import java.util.UUID;
 public class Mongo {
 
     public final MongoDatabase coreDatabase;
+    private final MongoClient mongoClient;
 
     private final ArrayList<UUID> owners = new ArrayList<>();
     private final ArrayList<UUID> admins = new ArrayList<>();
@@ -22,11 +23,11 @@ public class Mongo {
 
     public Mongo(BungeePlugin plugin) {
         String connectionString = "mongodb+srv://HybridNetwork:jdfsdsf879hjgfdg5@cluster0.0bfk6.mongodb.net/test?retryWrites=true&w=majority";
-        MongoClient mongoClient = new MongoClient(new MongoClientURI(connectionString));
 
+        this.mongoClient = new MongoClient(new MongoClientURI(connectionString));
         this.coreDatabase = mongoClient.getDatabase("coredata");
 
-        plugin.getLogger().info("The core database has been CONNECTED.");
+        plugin.getLogger().info("The bungee database has been CONNECTED.");
     }
 
     public Document loadDocument(String collectionName, UUID uuid) {
@@ -66,6 +67,10 @@ public class Mongo {
 
     public MongoDatabase getCoreDatabase() {
         return coreDatabase;
+    }
+
+    public MongoClient getMongoClient() {
+        return mongoClient;
     }
 
     public ArrayList<UUID> getOwners() {

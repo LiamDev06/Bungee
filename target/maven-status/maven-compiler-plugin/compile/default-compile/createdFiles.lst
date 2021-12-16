@@ -11,6 +11,7 @@ net\hybrid\bungee\utility\PlayerRank.class
 net\hybrid\bungee\commands\AdminChatCommand.class
 net\hybrid\bungee\party\PartyUtils.class
 net\hybrid\bungee\utility\CC.class
+net\hybrid\bungee\party\PartyListener.class
 net\hybrid\bungee\managers\ChatManager.class
 net\hybrid\bungee\utility\ChatChannel.class
 net\hybrid\bungee\data\mysql\MySQL.class

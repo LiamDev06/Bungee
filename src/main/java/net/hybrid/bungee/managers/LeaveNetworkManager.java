@@ -1,6 +1,7 @@
 package net.hybrid.bungee.managers;
 
 import net.hybrid.bungee.BungeePlugin;
+import net.hybrid.bungee.data.Mongo;
 import net.hybrid.bungee.utility.CC;
 import net.hybrid.bungee.utility.RankManager;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -17,12 +18,14 @@ public class LeaveNetworkManager implements Listener {
     @EventHandler
     public void onDisconnect(PlayerDisconnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        Document document = BungeePlugin.getInstance().getMongo().loadDocument(
+        Mongo mongo = BungeePlugin.getInstance().getMongo();
+
+        Document document = mongo.loadDocument(
                 "playerData", player.getUniqueId());
 
         if (!document.getString("staffRank").equalsIgnoreCase("")
                 || !document.getString("specialRank").equalsIgnoreCase("")) {
-            for (UUID targetUuid : BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode()) {
+            for (UUID targetUuid : mongo.getStaffOnNotifyMode()) {
                 ProxiedPlayer target = BungeePlugin.getInstance().getProxy().getPlayer(targetUuid);
 
                 target.sendMessage(new TextComponent(CC.translate(
@@ -33,12 +36,12 @@ public class LeaveNetworkManager implements Listener {
             }
         }
 
-        BungeePlugin.getInstance().getMongo().getStaffOnNotifyMode().remove(player.getUniqueId());
-        BungeePlugin.getInstance().getMongo().getStaff().remove(player.getUniqueId());
-        BungeePlugin.getInstance().getMongo().getAdmins().remove(player.getUniqueId());
-        BungeePlugin.getInstance().getMongo().getOwners().remove(player.getUniqueId());
+        mongo.getStaffOnNotifyMode().remove(player.getUniqueId());
+        mongo.getStaff().remove(player.getUniqueId());
+        mongo.getAdmins().remove(player.getUniqueId());
+        mongo.getOwners().remove(player.getUniqueId());
 
         document.replace("lastLogout", System.currentTimeMillis());
-        BungeePlugin.getInstance().getMongo().saveDocument("playerData", document, player.getUniqueId());
+        mongo.saveDocument("playerData", document, player.getUniqueId());
     }
 }
